@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load helpers %}
+
+{% block title %}Nautobot MCP Server{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <h1>Nautobot MCP Server</h1>
+    <p class="text-muted">
+      Model Context Protocol (MCP) server exposing Nautobot's REST and GraphQL
+      APIs to LLM/AI assistants. Version <strong>{{ version }}</strong>.
+    </p>
+  </div>
+</div>
+
+{% if config_error %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+      <strong>Not configured:</strong> {{ config_error }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if settings %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading"><strong>Resolved configuration</strong></div>
+      <table class="table table-hover panel-body attr-table">
+        <tr><td>URL</td><td>{{ settings.url }}</td></tr>
+        <tr><td>Token</td><td>{{ settings.token }}</td></tr>
+        <tr><td>Verify SSL</td><td>{{ settings.verify_ssl }}</td></tr>
+        <tr><td>Request timeout</td><td>{{ settings.request_timeout }}s</td></tr>
+        <tr><td>Max pagination records</td><td>{{ settings.max_pagination_records }}</td></tr>
+        <tr><td>Writes allowed</td><td>{{ settings.allow_writes }}</td></tr>
+        <tr><td>Tenant scope</td><td>{{ settings.tenant_scope|join:", "|default:"—" }}</td></tr>
+        <tr><td>Tenant group scope</td><td>{{ settings.tenant_group_scope|join:", "|default:"—" }}</td></tr>
+        <tr><td>Plugins</td><td>{{ settings.plugins|join:", " }}</td></tr>
+        <tr><td>Log level</td><td>{{ settings.log_level }}</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading"><strong>Available plugin integrations</strong></div>
+      <ul class="list-group">
+        {% for plugin in available_plugins %}
+        <li class="list-group-item">{{ plugin }}</li>
+        {% empty %}
+        <li class="list-group-item text-muted">None</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

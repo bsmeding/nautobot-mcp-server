@@ -1,0 +1,55 @@
+---
+# Base service definition for the Nautobot app development environment.
+# Compose with the postgres + redis overlays via the invoke `tasks.py` helpers.
+x-nautobot-build: &nautobot-build
+  build:
+    context: "../"
+    dockerfile: "development/Dockerfile"
+    args:
+      NAUTOBOT_VER: "${NAUTOBOT_VER:-2.4}"
+      PYTHON_VER: "${PYTHON_VER:-3.12}"
+  image: "nautobot-mcp-server/nautobot:${NAUTOBOT_VER:-2.4}-py${PYTHON_VER:-3.12}"
+
+x-nautobot-base: &nautobot-base
+  <<: *nautobot-build
+  env_file:
+    - "development.env"
+    - "creds.env"
+  tty: true
+
+services:
+  nautobot:
+    <<: *nautobot-base
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "db"
+      - "redis"
+    healthcheck:
+      test: ["CMD", "true"]
+    volumes:
+      - "../:/source"
+
+  celery_worker:
+    <<: *nautobot-base
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "nautobot-server celery worker -l INFO --concurrency 1"
+    depends_on:
+      - "nautobot"
+      - "redis"
+    volumes:
+      - "../:/source"
+
+  celery_beat:
+    <<: *nautobot-base
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "nautobot-server celery beat -l INFO"
+    depends_on:
+      - "nautobot"
+      - "redis"
+    volumes:
+      - "../:/source"

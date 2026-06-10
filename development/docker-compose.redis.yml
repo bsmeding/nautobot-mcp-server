@@ -1,0 +1,17 @@
+---
+# Redis backend (cache + celery broker) for the development environment.
+services:
+  redis:
+    image: "redis:7-alpine"
+    command:
+      - "sh"
+      - "-c"
+      - "redis-server --appendonly yes --requirepass $$REDIS_PASSWORD"
+    env_file:
+      - "development.env"
+      - "creds.env"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: "10s"
+      timeout: "5s"
+      retries: 10

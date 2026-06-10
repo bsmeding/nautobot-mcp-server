@@ -1,0 +1,123 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nautobot-mcp-server"
+version = "0.2.0"
+description = "Nautobot app and Model Context Protocol (MCP) server exposing Nautobot's REST and GraphQL APIs to LLMs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "bsmeding", email = "b@rtsmeding.nl" },
+]
+keywords = [
+  "nautobot",
+  "nautobot-app",
+  "mcp",
+  "model-context-protocol",
+  "network-automation",
+  "llm",
+  "ai",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: Django",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: System :: Networking",
+  "Topic :: System :: Networking :: Monitoring",
+]
+dependencies = [
+  "mcp>=1.2.0,<2.0",
+  "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+nautobot = [
+  "nautobot>=2.4.0,<4.0.0",
+]
+# --- Optional Nautobot app (plugin) integrations ---------------------------
+# These pull in the corresponding NetworkToCode app. They matter mainly when
+# the MCP server runs *inside* the Nautobot environment (as an app). For a
+# standalone MCP server talking to a remote Nautobot, the app lives on that
+# remote instance instead — in that case enable the matching plugin tools via
+# NAUTOBOT_MCP_PLUGINS rather than installing these extras.
+design-builder = [
+  "nautobot-design-builder>=1.0.0",
+]
+onboarding = [
+  "nautobot-device-onboarding>=4.0.0",
+]
+ssot = [
+  "nautobot-ssot>=3.0.0",
+]
+golden-config = [
+  "nautobot-golden-config>=2.0.0",
+]
+nornir = [
+  "nautobot-plugin-nornir>=2.0.0",
+]
+all = [
+  "nautobot-design-builder>=1.0.0",
+  "nautobot-device-onboarding>=4.0.0",
+  "nautobot-ssot>=3.0.0",
+  "nautobot-golden-config>=2.0.0",
+  "nautobot-plugin-nornir>=2.0.0",
+]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "respx>=0.21",
+  "ruff>=0.5",
+  "build>=1.2",
+  "invoke>=2.2",
+]
+docs = [
+  "mkdocs>=1.5",
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.24",
+]
+
+[project.scripts]
+nautobot-mcp-server = "nautobot_mcp_server.server:main"
+
+[project.urls]
+Homepage = "https://github.com/bsmeding/nautobot-mcp-server"
+Repository = "https://github.com/bsmeding/nautobot-mcp-server"
+Issues = "https://github.com/bsmeding/nautobot-mcp-server/issues"
+Changelog = "https://github.com/bsmeding/nautobot-mcp-server/releases"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nautobot_mcp_server*"]
+
+[tool.setuptools.package-data]
+nautobot_mcp_server = ["py.typed", "templates/**/*.html"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B", "SIM"]
+# Nautobot's AppConfig contract uses class-level mutable defaults.
+"nautobot_mcp_server/apps.py" = ["RUF012"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
