@@ -1,5 +1,12 @@
 # Release Notes
 
+## Unreleased
+
+- Rename MCP-specific env vars to the `NAUTOBOT_MCP_` prefix
+  (`NAUTOBOT_MCP_ALLOW_WRITES`, `NAUTOBOT_MCP_TENANT_SCOPE`, …).
+  `NAUTOBOT_URL` / `NAUTOBOT_TOKEN` are unchanged. Legacy unprefixed names
+  remain accepted as aliases.
+
 ## v0.2.0
 
 - Tenant scoping for MSP / multi-tenant isolation (`tenant_scope`,

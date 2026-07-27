@@ -25,9 +25,9 @@ def test_load_settings_from_kwargs() -> None:
 def test_load_settings_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("NAUTOBOT_URL", "https://env.example.com")
     monkeypatch.setenv("NAUTOBOT_TOKEN", "envtoken")
-    monkeypatch.setenv("NAUTOBOT_VERIFY_SSL", "false")
-    monkeypatch.setenv("NAUTOBOT_TIMEOUT", "12.5")
-    monkeypatch.setenv("NAUTOBOT_ALLOW_WRITES", "yes")
+    monkeypatch.setenv("NAUTOBOT_MCP_VERIFY_SSL", "false")
+    monkeypatch.setenv("NAUTOBOT_MCP_TIMEOUT", "12.5")
+    monkeypatch.setenv("NAUTOBOT_MCP_ALLOW_WRITES", "yes")
 
     s = load_settings()
 
@@ -36,6 +36,35 @@ def test_load_settings_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     assert s.verify_ssl is False
     assert s.request_timeout == 12.5
     assert s.allow_writes is True
+
+
+def test_legacy_env_aliases_still_work(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Unprefixed / MCP_LOG_LEVEL names remain accepted during migration."""
+    monkeypatch.setenv("NAUTOBOT_URL", "https://legacy.example.com")
+    monkeypatch.setenv("NAUTOBOT_TOKEN", "legacytoken")
+    monkeypatch.setenv("NAUTOBOT_VERIFY_SSL", "false")
+    monkeypatch.setenv("NAUTOBOT_TIMEOUT", "9")
+    monkeypatch.setenv("NAUTOBOT_ALLOW_WRITES", "true")
+    monkeypatch.setenv("NAUTOBOT_TENANT_SCOPE", "acme")
+    monkeypatch.setenv("MCP_LOG_LEVEL", "debug")
+
+    s = load_settings()
+
+    assert s.verify_ssl is False
+    assert s.request_timeout == 9.0
+    assert s.allow_writes is True
+    assert s.tenant_scope == ("acme",)
+    assert s.log_level == "DEBUG"
+
+
+def test_prefixed_env_beats_legacy_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("NAUTOBOT_URL", "https://x.example.com")
+    monkeypatch.setenv("NAUTOBOT_TOKEN", "t")
+    monkeypatch.setenv("NAUTOBOT_ALLOW_WRITES", "true")
+    monkeypatch.setenv("NAUTOBOT_MCP_ALLOW_WRITES", "false")
+
+    s = load_settings()
+    assert s.allow_writes is False
 
 
 def test_kwargs_beat_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -49,7 +78,7 @@ def test_kwargs_beat_env(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_ca_bundle_path_used_for_verify(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("NAUTOBOT_URL", "https://x.example.com")
     monkeypatch.setenv("NAUTOBOT_TOKEN", "t")
-    monkeypatch.setenv("NAUTOBOT_CA_BUNDLE", "/etc/ssl/corp-ca.pem")
+    monkeypatch.setenv("NAUTOBOT_MCP_CA_BUNDLE", "/etc/ssl/corp-ca.pem")
     s = load_settings()
     assert s.verify_ssl == "/etc/ssl/corp-ca.pem"
 

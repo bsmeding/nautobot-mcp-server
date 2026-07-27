@@ -3,11 +3,10 @@
 Resolution order (highest priority first):
 
 1. Explicit kwargs passed to :func:`load_settings`.
-2. Environment variables (``NAUTOBOT_URL``, ``NAUTOBOT_TOKEN``,
-   ``NAUTOBOT_VERIFY_SSL``, ``NAUTOBOT_CA_BUNDLE``, ``NAUTOBOT_TIMEOUT``,
-   ``NAUTOBOT_MAX_PAGINATION_RECORDS``, ``NAUTOBOT_ALLOW_WRITES``,
-   ``NAUTOBOT_TENANT_SCOPE``, ``NAUTOBOT_TENANT_GROUP_SCOPE``,
-   ``NAUTOBOT_MCP_PLUGINS``, ``MCP_LOG_LEVEL``).
+2. Environment variables (``NAUTOBOT_URL``, ``NAUTOBOT_TOKEN``, and the
+   ``NAUTOBOT_MCP_*`` settings below). Unprefixed legacy aliases
+   (``NAUTOBOT_ALLOW_WRITES``, ``NAUTOBOT_TENANT_SCOPE``, …) are still
+   accepted but the ``NAUTOBOT_MCP_*`` form wins when both are set.
 3. ``settings.PLUGINS_CONFIG["nautobot_mcp_server"]`` when running inside
    Nautobot/Django.
 """
@@ -19,11 +18,38 @@ from dataclasses import dataclass
 from typing import Any
 
 
+# Canonical env names → optional legacy aliases (deprecated).
+# Connection credentials stay as NAUTOBOT_URL / NAUTOBOT_TOKEN; MCP-specific
+# behaviour uses the NAUTOBOT_MCP_ prefix to avoid colliding with Nautobot core.
+_ENV_ALIASES: dict[str, tuple[str, ...]] = {
+    "NAUTOBOT_MCP_VERIFY_SSL": ("NAUTOBOT_VERIFY_SSL",),
+    "NAUTOBOT_MCP_CA_BUNDLE": ("NAUTOBOT_CA_BUNDLE",),
+    "NAUTOBOT_MCP_TIMEOUT": ("NAUTOBOT_TIMEOUT",),
+    "NAUTOBOT_MCP_MAX_PAGINATION_RECORDS": ("NAUTOBOT_MAX_PAGINATION_RECORDS",),
+    "NAUTOBOT_MCP_ALLOW_WRITES": ("NAUTOBOT_ALLOW_WRITES",),
+    "NAUTOBOT_MCP_TENANT_SCOPE": ("NAUTOBOT_TENANT_SCOPE",),
+    "NAUTOBOT_MCP_TENANT_GROUP_SCOPE": ("NAUTOBOT_TENANT_GROUP_SCOPE",),
+    "NAUTOBOT_MCP_LOG_LEVEL": ("MCP_LOG_LEVEL",),
+}
+
+
+def _getenv(name: str) -> str | None:
+    """Read ``name``, falling back to any registered legacy aliases."""
+    value = os.getenv(name)
+    if value not in (None, ""):
+        return value
+    for alias in _ENV_ALIASES.get(name, ()):
+        alias_val = os.getenv(alias)
+        if alias_val not in (None, ""):
+            return alias_val
+    return value  # None or ""
+
+
 def _coerce_str_tuple(value: Any) -> tuple[str, ...]:
     """Coerce a value into a tuple of non-empty strings.
 
     Accepts a list/tuple, or a comma-separated string (handy for env vars
-    like ``NAUTOBOT_TENANT_SCOPE=acme,globex``).
+    like ``NAUTOBOT_MCP_TENANT_SCOPE=acme,globex``).
     """
     if value is None:
         return ()
@@ -105,7 +131,7 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
     def _pick(key: str, env: str, *, default: Any = None) -> Any:
         if overrides.get(key) not in (None, ""):
             return overrides[key]
-        env_val = os.getenv(env)
+        env_val = _getenv(env)
         if env_val not in (None, ""):
             return env_val
         django_val = django_cfg.get(_django_key(key))
@@ -119,7 +145,7 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
     # SSL verification: bool, or path to CA bundle, or False to disable.
     ca_bundle = (
         overrides.get("ca_bundle")
-        or os.getenv("NAUTOBOT_CA_BUNDLE")
+        or _getenv("NAUTOBOT_MCP_CA_BUNDLE")
         or django_cfg.get("ca_bundle")
         or ""
     )
@@ -127,33 +153,33 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
         verify_ssl: bool | str = overrides["verify_ssl"]
     elif ca_bundle:
         verify_ssl = str(ca_bundle)
-    elif os.getenv("NAUTOBOT_VERIFY_SSL") is not None:
-        verify_ssl = _coerce_bool(os.getenv("NAUTOBOT_VERIFY_SSL"), True)
+    elif _getenv("NAUTOBOT_MCP_VERIFY_SSL") is not None:
+        verify_ssl = _coerce_bool(_getenv("NAUTOBOT_MCP_VERIFY_SSL"), True)
     else:
         verify_ssl = bool(django_cfg.get("verify_ssl", True))
 
     request_timeout = float(
-        _pick("request_timeout", "NAUTOBOT_TIMEOUT", default=30.0) or 30.0
+        _pick("request_timeout", "NAUTOBOT_MCP_TIMEOUT", default=30.0) or 30.0
     )
     max_pagination_records = int(
         _pick(
             "max_pagination_records",
-            "NAUTOBOT_MAX_PAGINATION_RECORDS",
+            "NAUTOBOT_MCP_MAX_PAGINATION_RECORDS",
             default=5000,
         )
         or 5000
     )
     allow_writes = _coerce_bool(
-        _pick("allow_writes", "NAUTOBOT_ALLOW_WRITES", default=False), False
+        _pick("allow_writes", "NAUTOBOT_MCP_ALLOW_WRITES", default=False), False
     )
     log_level = str(
-        _pick("log_level", "MCP_LOG_LEVEL", default="INFO") or "INFO"
+        _pick("log_level", "NAUTOBOT_MCP_LOG_LEVEL", default="INFO") or "INFO"
     ).upper()
     tenant_scope = _coerce_str_tuple(
-        _pick("tenant_scope", "NAUTOBOT_TENANT_SCOPE", default=())
+        _pick("tenant_scope", "NAUTOBOT_MCP_TENANT_SCOPE", default=())
     )
     tenant_group_scope = _coerce_str_tuple(
-        _pick("tenant_group_scope", "NAUTOBOT_TENANT_GROUP_SCOPE", default=())
+        _pick("tenant_group_scope", "NAUTOBOT_MCP_TENANT_GROUP_SCOPE", default=())
     )
     plugins = _coerce_str_tuple(
         _pick("plugins", "NAUTOBOT_MCP_PLUGINS", default="auto")

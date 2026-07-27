@@ -6,9 +6,9 @@ tenants. Set `tenant_scope` (tenant names/slugs) and/or `tenant_group_scope`
 (tenant group names), via env vars or `PLUGINS_CONFIG`:
 
 ```bash
-export NAUTOBOT_TENANT_SCOPE="acme"
-export NAUTOBOT_TENANT_SCOPE="acme,globex"        # multiple
-export NAUTOBOT_TENANT_GROUP_SCOPE="managed-customers"
+export NAUTOBOT_MCP_TENANT_SCOPE="acme"
+export NAUTOBOT_MCP_TENANT_SCOPE="acme,globex"        # multiple
+export NAUTOBOT_MCP_TENANT_GROUP_SCOPE="managed-customers"
 ```
 
 When a scope is active, enforcement happens centrally in the client so an agent

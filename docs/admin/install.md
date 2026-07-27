@@ -45,12 +45,16 @@ nautobot-mcp-server
 | --- | --- | --- | --- |
 | `NAUTOBOT_URL` | `nautobot_url` | — (required) | Nautobot base URL. |
 | `NAUTOBOT_TOKEN` | `nautobot_token` | — (required) | API token. |
-| `NAUTOBOT_VERIFY_SSL` | `verify_ssl` | `true` | TLS verification. |
-| `NAUTOBOT_CA_BUNDLE` | `ca_bundle` | — | CA bundle path. |
-| `NAUTOBOT_TIMEOUT` | `request_timeout` | `30` | HTTP timeout (s). |
-| `NAUTOBOT_MAX_PAGINATION_RECORDS` | `max_pagination_records` | `5000` | Pagination cap. |
-| `NAUTOBOT_ALLOW_WRITES` | `allow_writes` | `false` | Enable write tools. |
-| `NAUTOBOT_TENANT_SCOPE` | `tenant_scope` | — | Restrict to tenants. |
-| `NAUTOBOT_TENANT_GROUP_SCOPE` | `tenant_group_scope` | — | Restrict to tenant groups. |
+| `NAUTOBOT_MCP_VERIFY_SSL` | `verify_ssl` | `true` | TLS verification. |
+| `NAUTOBOT_MCP_CA_BUNDLE` | `ca_bundle` | — | CA bundle path. |
+| `NAUTOBOT_MCP_TIMEOUT` | `request_timeout` | `30` | HTTP timeout (s). |
+| `NAUTOBOT_MCP_MAX_PAGINATION_RECORDS` | `max_pagination_records` | `5000` | Pagination cap. |
+| `NAUTOBOT_MCP_ALLOW_WRITES` | `allow_writes` | `false` | Enable write tools. |
+| `NAUTOBOT_MCP_TENANT_SCOPE` | `tenant_scope` | — | Restrict to tenants. |
+| `NAUTOBOT_MCP_TENANT_GROUP_SCOPE` | `tenant_group_scope` | — | Restrict to tenant groups. |
 | `NAUTOBOT_MCP_PLUGINS` | `plugins` | `auto` | Plugin integrations to enable. |
-| `MCP_LOG_LEVEL` | `log_level` | `INFO` | Log level. |
+| `NAUTOBOT_MCP_LOG_LEVEL` | `log_level` | `INFO` | Log level. |
+
+Legacy unprefixed names (`NAUTOBOT_ALLOW_WRITES`, `NAUTOBOT_TENANT_SCOPE`,
+`MCP_LOG_LEVEL`, …) are still accepted; the `NAUTOBOT_MCP_*` form wins when
+both are set.

@@ -44,7 +44,7 @@ def _mock_tenant_resolution(name: str = "acme", tenant_id: str = ACME_ID) -> Non
 def test_tenant_scope_parses_csv_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("NAUTOBOT_URL", BASE)
     monkeypatch.setenv("NAUTOBOT_TOKEN", "tok")
-    monkeypatch.setenv("NAUTOBOT_TENANT_SCOPE", "acme, globex ,")
+    monkeypatch.setenv("NAUTOBOT_MCP_TENANT_SCOPE", "acme, globex ,")
     s = load_settings()
     assert s.tenant_scope == ("acme", "globex")
     assert s.tenant_scoped is True

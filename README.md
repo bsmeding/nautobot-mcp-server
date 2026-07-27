@@ -111,14 +111,20 @@ All configuration knobs:
 | --- | --- | --- |
 | `NAUTOBOT_URL` | — (required) | Nautobot base URL. |
 | `NAUTOBOT_TOKEN` | — (required) | Nautobot API token. |
-| `NAUTOBOT_VERIFY_SSL` | `true` | `false` disables TLS verification. |
-| `NAUTOBOT_CA_BUNDLE` | — | Path to a CA bundle (private CA setups). |
-| `NAUTOBOT_TIMEOUT` | `30` | HTTP timeout in seconds. |
-| `NAUTOBOT_MAX_PAGINATION_RECORDS` | `5000` | Hard cap when `paginate=True`. |
-| `NAUTOBOT_ALLOW_WRITES` | `false` | Enable POST/PATCH/PUT/DELETE tools. |
-| `NAUTOBOT_TENANT_SCOPE` | — | Comma-separated tenant names/slugs to restrict access to. |
-| `NAUTOBOT_TENANT_GROUP_SCOPE` | — | Comma-separated tenant group names to restrict access to. |
-| `MCP_LOG_LEVEL` | `INFO` | Log level (logs go to stderr). |
+| `NAUTOBOT_MCP_VERIFY_SSL` | `true` | `false` disables TLS verification. |
+| `NAUTOBOT_MCP_CA_BUNDLE` | — | Path to a CA bundle (private CA setups). |
+| `NAUTOBOT_MCP_TIMEOUT` | `30` | HTTP timeout in seconds. |
+| `NAUTOBOT_MCP_MAX_PAGINATION_RECORDS` | `5000` | Hard cap when `paginate=True`. |
+| `NAUTOBOT_MCP_ALLOW_WRITES` | `false` | Enable POST/PATCH/PUT/DELETE tools. |
+| `NAUTOBOT_MCP_TENANT_SCOPE` | — | Comma-separated tenant names/slugs to restrict access to. |
+| `NAUTOBOT_MCP_TENANT_GROUP_SCOPE` | — | Comma-separated tenant group names to restrict access to. |
+| `NAUTOBOT_MCP_PLUGINS` | `auto` | Plugin integrations to enable. |
+| `NAUTOBOT_MCP_LOG_LEVEL` | `INFO` | Log level (logs go to stderr). |
+
+Connection credentials stay as `NAUTOBOT_URL` / `NAUTOBOT_TOKEN`. MCP-specific
+knobs use the `NAUTOBOT_MCP_` prefix. Legacy unprefixed names
+(`NAUTOBOT_ALLOW_WRITES`, `NAUTOBOT_TENANT_SCOPE`, `MCP_LOG_LEVEL`, …) are
+still accepted; the prefixed form wins when both are set.
 
 ## Hooking into Claude Desktop
 
@@ -148,7 +154,7 @@ nautobot-mcp-server --transport sse
 ## Read-only by default
 
 Mutating operations (`rest_create`, `rest_update`, `rest_delete`) are blocked
-unless you explicitly set `NAUTOBOT_ALLOW_WRITES=true` (or `allow_writes: true`
+unless you explicitly set `NAUTOBOT_MCP_ALLOW_WRITES=true` (or `allow_writes: true`
 in `PLUGINS_CONFIG`). GraphQL queries and Nautobot Job runs are allowed
 regardless, since they are sandboxed by Nautobot's own permission model and
 the API token's scope.
@@ -161,10 +167,10 @@ or more tenants. Set `tenant_scope` (tenant names/slugs) and/or
 `tenant_group_scope` (tenant group names), via env vars or `PLUGINS_CONFIG`:
 
 ```bash
-export NAUTOBOT_TENANT_SCOPE="acme"
+export NAUTOBOT_MCP_TENANT_SCOPE="acme"
 # or multiple / by group:
-export NAUTOBOT_TENANT_SCOPE="acme,globex"
-export NAUTOBOT_TENANT_GROUP_SCOPE="managed-customers"
+export NAUTOBOT_MCP_TENANT_SCOPE="acme,globex"
+export NAUTOBOT_MCP_TENANT_GROUP_SCOPE="managed-customers"
 ```
 
 When a scope is active, enforcement happens centrally in the client, so an

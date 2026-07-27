@@ -51,8 +51,8 @@ PLUGINS_CONFIG = {
     "nautobot_mcp_server": {
         "nautobot_url": _env("NAUTOBOT_URL", "http://localhost:8080"),
         "nautobot_token": _env("NAUTOBOT_TOKEN", ""),
-        "allow_writes": is_truthy(_env("NAUTOBOT_ALLOW_WRITES", "False")),
+        "allow_writes": is_truthy(_env("NAUTOBOT_MCP_ALLOW_WRITES", "False")),
         "plugins": _env("NAUTOBOT_MCP_PLUGINS", "auto").split(","),
-        "log_level": _env("MCP_LOG_LEVEL", "INFO"),
+        "log_level": _env("NAUTOBOT_MCP_LOG_LEVEL", "INFO"),
     }
 }

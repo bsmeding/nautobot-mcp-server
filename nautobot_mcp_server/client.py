@@ -96,7 +96,7 @@ class NautobotClient:
         ):
             raise PermissionError(
                 f"Refusing {method} {endpoint}: writes are disabled. "
-                "Set NAUTOBOT_ALLOW_WRITES=true (or allow_writes=true in "
+                "Set NAUTOBOT_MCP_ALLOW_WRITES=true (or allow_writes=true in "
                 "PLUGINS_CONFIG) to enable mutating operations."
             )
 
