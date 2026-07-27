@@ -17,7 +17,6 @@ import os
 from dataclasses import dataclass
 from typing import Any
 
-
 # Canonical env names → optional legacy aliases (deprecated).
 # Connection credentials stay as NAUTOBOT_URL / NAUTOBOT_TOKEN; MCP-specific
 # behaviour uses the NAUTOBOT_MCP_ prefix to avoid colliding with Nautobot core.
