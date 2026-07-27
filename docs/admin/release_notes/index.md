@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## v0.2.1
 
 - Rename MCP-specific env vars to the `NAUTOBOT_MCP_` prefix
   (`NAUTOBOT_MCP_ALLOW_WRITES`, `NAUTOBOT_MCP_TENANT_SCOPE`, …).
