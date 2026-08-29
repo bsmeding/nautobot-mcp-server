@@ -5,10 +5,10 @@ resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
     "python_full_version >= '3.14' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32'",
-    "python_full_version < '3.11' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform != 'win32'",
+    "python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
     "python_full_version < '3.11' and sys_platform != 'win32'",
 ]
 
@@ -1096,7 +1096,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -1449,18 +1449,17 @@ wheels = [
 
 [[package]]
 name = "httpx"
-version = "0.27.0"
+version = "0.28.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
     { name = "certifi" },
     { name = "httpcore" },
     { name = "idna" },
-    { name = "sniffio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/2d/3da5bdf4408b8b2800061c339f240c1802f2e82d55e50bd39c5a881f47f0/httpx-0.27.0.tar.gz", hash = "sha256:a0cb88a46f32dc874e04ee956e4c2764aba2aa228f650b06788ba6bda2962ab5", size = 126413, upload-time = "2024-02-21T13:07:52.434Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406, upload-time = "2024-12-06T15:37:23.222Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/41/7b/ddacf6dcebb42466abd03f368782142baa82e08fc0c1f8eaa05b4bae87d5/httpx-0.27.0-py3-none-any.whl", hash = "sha256:71d5465162c13681bff01ad59b2cc68dd838ea1f10e51574bac27103f00c91a5", size = 75590, upload-time = "2024-02-21T13:07:50.455Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517, upload-time = "2024-12-06T15:37:21.509Z" },
 ]
 
 [[package]]
@@ -1486,7 +1485,7 @@ name = "importlib-metadata"
 version = "9.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp", marker = "python_full_version < '3.14'" },
+    { name = "zipp" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a9/01/15bb152d77b21318514a96f43af312635eb2500c96b55398d020c93d86ea/importlib_metadata-9.0.0.tar.gz", hash = "sha256:a4f57ab599e6a2e3016d7595cfd72eb4661a5106e787a95bcc90c7105b831efc", size = 56405, upload-time = "2026-03-20T06:42:56.999Z" }
 wheels = [
@@ -1866,7 +1865,7 @@ wheels = [
 
 [[package]]
 name = "mcp"
-version = "1.12.4"
+version = "1.29.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1875,15 +1874,18 @@ dependencies = [
     { name = "jsonschema" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyjwt", extra = ["crypto"] },
     { name = "python-multipart" },
     { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "sse-starlette" },
     { name = "starlette" },
+    { name = "typing-extensions" },
+    { name = "typing-inspection" },
     { name = "uvicorn", marker = "sys_platform != 'emscripten'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/31/88/f6cb7e7c260cd4b4ce375f2b1614b33ce401f63af0f49f7141a2e9bf0a45/mcp-1.12.4.tar.gz", hash = "sha256:0765585e9a3a5916a3c3ab8659330e493adc7bd8b2ca6120c2d7a0c43e034ca5", size = 431148, upload-time = "2025-08-07T20:31:18.082Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/48/0bb26fdfe7ac16875f534a101ce2405eae192bdef37e7451f2f4507c13ec/mcp-1.29.1.tar.gz", hash = "sha256:1967ba4c315f7a375146209949f45950d18b0efd2f913d7cf3400bc723ee5f04", size = 646823, upload-time = "2026-08-24T18:30:41.161Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/68/316cbc54b7163fa22571dcf42c9cc46562aae0a021b974e0a8141e897200/mcp-1.12.4-py3-none-any.whl", hash = "sha256:7aa884648969fab8e78b89399d59a683202972e12e6bc9a1c88ce7eda7743789", size = 160145, upload-time = "2025-08-07T20:31:15.69Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/04/d6b4fb82eefe9e81807aabca1ac98f460ae0883974b83a997aaa20c52545/mcp-1.29.1-py3-none-any.whl", hash = "sha256:b6310eeb59153300c4ab8b9aec4c52f4819a2d6a8e429eb43d908bed7c783648", size = 224653, upload-time = "2026-08-24T18:30:39.573Z" },
 ]
 
 [[package]]
@@ -2284,7 +2286,7 @@ wheels = [
 
 [[package]]
 name = "nautobot-device-onboarding"
-version = "5.4.0"
+version = "5.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jdiff" },
@@ -2297,9 +2299,9 @@ dependencies = [
     { name = "ttp" },
     { name = "zipp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/31/5c148daa84533dc8fcaae8cfef6674549fe4a2082239d5359e40236989f5/nautobot_device_onboarding-5.4.0.tar.gz", hash = "sha256:9a1abefd5a904028d6e21e6cc3e85fbe7bef5494098c4aca8a5d4486f2beef87", size = 4032961, upload-time = "2026-07-01T19:43:45.568Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/d4/97b6a532636155b19332a0c3c3d4b5399f202b6ef77ed1a26a79b4d9f0b3/nautobot_device_onboarding-5.5.0.tar.gz", hash = "sha256:cf3033a5dfb3ff73e291feb8cd1fdac32eb026d2bab83d4f09883518ed5a56dd", size = 4048125, upload-time = "2026-08-17T21:11:13.209Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/59/3ebe2be2b8509707f4a070e3a9b8cd80179454ccc402bf9e8fe9e74871ff/nautobot_device_onboarding-5.4.0-py3-none-any.whl", hash = "sha256:f332eab066d209802427ab0d26561b00c3fb3ebe78875f2438980ffe393c7176", size = 4276917, upload-time = "2026-07-01T19:43:43.958Z" },
+    { url = "https://files.pythonhosted.org/packages/66/b9/4761ea5fb4e35a2af241cec7c770bc1cf9da95a2bdcbe3f16286d2ade859/nautobot_device_onboarding-5.5.0-py3-none-any.whl", hash = "sha256:72371b276b611789054ebed3d33269df06b65cb8a694e6ae2fc29bec717b2572", size = 4291614, upload-time = "2026-08-17T21:11:11.276Z" },
 ]
 
 [[package]]
@@ -2324,7 +2326,7 @@ wheels = [
 
 [[package]]
 name = "nautobot-mcp-server"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
@@ -2467,11 +2469,11 @@ wheels = [
 
 [[package]]
 name = "netutils"
-version = "1.17.3"
+version = "1.19.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f1/3a/ed510c41a8a6ecbbf3d346521cbe1529e71fbd30b601e9c1c30b44bbe67d/netutils-1.17.3.tar.gz", hash = "sha256:d1b94b2f5ff899824237141eec76b9f75fac44fcf8c0f871520336b8938d2eb4", size = 521064, upload-time = "2026-07-07T15:01:17.144Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2e/81/68132139a13f052975ff64ed365492e3ad5b4f5e1c2d3cf0ebbb154be874/netutils-1.19.1.tar.gz", hash = "sha256:330dd2d0fece3bf9507304fe77c1c905e5f88ffbf56d2a80459d067be594f126", size = 549537, upload-time = "2026-08-26T14:40:42.669Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/9e/2a441f8666f56ba7df95aef31e4bb15f161a4181734aa4a8845464be4d25/netutils-1.17.3-py3-none-any.whl", hash = "sha256:2d96faab35a02450b304bc24af7f0547682e044f541100e9bed8087f538c2b48", size = 535838, upload-time = "2026-07-07T15:01:16.042Z" },
+    { url = "https://files.pythonhosted.org/packages/20/37/12c0c74368337ef8d5857801c7c13edbe08b206f66a794473c65a78622d3/netutils-1.19.1-py3-none-any.whl", hash = "sha256:d23eabb46a59c9833d662730e63ca828d033a1c09e1d2a8ee39f1b3f0a9e2b57", size = 565051, upload-time = "2026-08-26T14:40:40.804Z" },
 ]
 
 [[package]]
@@ -2536,7 +2538,7 @@ wheels = [
 
 [[package]]
 name = "nornir-nautobot"
-version = "4.3.0"
+version = "4.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -2557,9 +2559,9 @@ dependencies = [
     { name = "scrapli" },
     { name = "ttp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/91/35/3ae99beaea8ef93c41eb4dab8159e56173c95a7ec124e95b2def4cce6cd0/nornir_nautobot-4.3.0.tar.gz", hash = "sha256:415e7210fbec128fb6bdeeb5eba7d077ce7f97b72a87186b8773df0948297a4c", size = 32452, upload-time = "2026-07-16T17:44:05.547Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/83/11c38cd476141095140244d2812d12aad286dac22b5f6e19986c3469f4ac/nornir_nautobot-4.4.0.tar.gz", hash = "sha256:3c93f8aa34bad370315fe9a75143381b2f61519ee18d123340f5b3653e4ed113", size = 32565, upload-time = "2026-08-13T15:44:17.134Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/75/18/f97bed52048476ec83e49fd4ace19e2f35c98902ef0f01814b302598d87e/nornir_nautobot-4.3.0-py3-none-any.whl", hash = "sha256:77bba797502d18f8e56d246fae473734dae55d0ab6f6a4e2d119761d587c4068", size = 42465, upload-time = "2026-07-16T17:44:04.232Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/b1/91aea5e71211008ca5ab27dfd72b216760a61470977e1d2e05eb2df427f2/nornir_nautobot-4.4.0-py3-none-any.whl", hash = "sha256:59830c8d5a920ced6f357dc8d80235e7525cd54585124c9683c5c8916260b8c3", size = 42507, upload-time = "2026-08-13T15:44:15.916Z" },
 ]
 
 [[package]]
@@ -4160,8 +4162,8 @@ resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
     "python_full_version >= '3.14' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform != 'win32'",
+    "python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform != 'win32'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/aa/2a/9618a122aeb2a169a28b03889a2995fe297588964333d4a7d67bdf46e147/rpds_py-2026.6.3.tar.gz", hash = "sha256:1cebd1337c242e4ec2293e541f712b2da849b29f48f0c293684b71c0632625d4", size = 64051, upload-time = "2026-06-30T07:17:53.009Z" }
@@ -4403,15 +4405,6 @@ wheels = [
 ]
 
 [[package]]
-name = "sniffio"
-version = "1.3.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964ddf5cfdbd/sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc", size = 20372, upload-time = "2024-02-25T23:20:04.057Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2", size = 10235, upload-time = "2024-02-25T23:20:01.196Z" },
-]
-
-[[package]]
 name = "social-auth-app-django"
 version = "5.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4594,11 +4587,11 @@ wheels = [
 
 [[package]]
 name = "ttp"
-version = "0.9.5"
+version = "0.10.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6e/4f/b95e48d3b653e1b1494a3a5b15614db5a340826282c5389e38cb2248da39/ttp-0.9.5.tar.gz", hash = "sha256:234414f4d3039d2d1cde09993f89f8db1b34d447f76c6a402555cefac2e59c4e", size = 69141, upload-time = "2023-06-25T00:28:14.036Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/b6/bc65b4535792a111029e12d36e232f7f234e5b192ad7d894f37f159ae6e5/ttp-0.10.1.tar.gz", hash = "sha256:9c928aeb1f2dade05419c7ecc756d62cb45857deb5cc6b1b9f2058e70f25ae59", size = 64800, upload-time = "2026-03-21T04:25:27.573Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/38/d475e7bde8d192ca5d64ccc0988f3d58f36211bd68c32b6c5883332a8abf/ttp-0.9.5-py2.py3-none-any.whl", hash = "sha256:2c9fcf560b3f696e9fdd3554dc8e4622cbb10cac1d4fca13a7cf608c4a7fd137", size = 85763, upload-time = "2023-06-25T00:28:11.949Z" },
+    { url = "https://files.pythonhosted.org/packages/72/36/4f50c2a40da37704a874170cacf823545d5e75200b59af05d81f4e4e2066/ttp-0.10.1-py3-none-any.whl", hash = "sha256:2c8bc871f7740b690c6df6fb8c9633be58fcda123eea3e53be40a79e4af54b83", size = 84370, upload-time = "2026-03-21T04:25:26.147Z" },
 ]
 
 [[package]]
