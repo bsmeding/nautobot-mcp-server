@@ -8,9 +8,11 @@ SSoT data source/target jobs.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._common import list_jobs_matching, plugin_rest_list, run_job_by_name_or_id
 
@@ -19,7 +21,7 @@ DIST_PACKAGES: tuple[str, ...] = ("nautobot_ssot",)
 APP_URL = "ssot"
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_ssot_jobs() -> Any:
         """List installed SSoT data source/target jobs."""
@@ -35,9 +37,7 @@ def register(mcp: FastMCP) -> None:
         Endpoint: ``/api/plugins/ssot/sync/``. If your SSoT version does not
         expose REST sync records, fall back to ``list_recent_job_results``.
         """
-        return await plugin_rest_list(
-            APP_URL, "sync", filters=filters, paginate=paginate
-        )
+        return await plugin_rest_list(APP_URL, "sync", filters=filters, paginate=paginate)
 
     @mcp.tool()
     async def list_ssot_sync_logs(

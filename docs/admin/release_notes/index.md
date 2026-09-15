@@ -4,9 +4,10 @@
 
 - Publish on PyPI as `nautobot-mcp` (the `nautobot-mcp-server` console script
   is unchanged).
-- Security: require `mcp>=1.28.1` and refresh the lockfile onto patched
-  GitPython, sqlparse, Django REST framework, and cryptography.
-  Paramiko stays on 4.x (Netmiko is not compatible with Paramiko 5).
+- Migrate the server from mcp 1.x `FastMCP` to mcp 2.x `MCPServer`.
+- Security: refresh the lockfile onto patched GitPython, sqlparse, Django REST
+  framework, and cryptography. Paramiko stays on 4.x (Netmiko is not
+  compatible with Paramiko 5).
 
 ## v0.2.1
 

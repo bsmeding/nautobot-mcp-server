@@ -8,9 +8,11 @@ Jobs, so these tools are job-centric.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._common import list_jobs_matching, run_job_by_name_or_id
 
@@ -18,7 +20,7 @@ KEY = "onboarding"
 DIST_PACKAGES: tuple[str, ...] = ("nautobot_device_onboarding",)
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_onboarding_jobs() -> Any:
         """List installed device-onboarding jobs."""

@@ -31,7 +31,7 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mcp.server.fastmcp import FastMCP
+    from mcp.server.mcpserver import MCPServer
 
 logger = logging.getLogger("nautobot_mcp_server.tools.plugins")
 
@@ -70,14 +70,12 @@ def is_plugin_enabled(
     return False
 
 
-def register_plugins(mcp: FastMCP, plugins_setting: tuple[str, ...]) -> list[str]:
+def register_plugins(mcp: MCPServer, plugins_setting: tuple[str, ...]) -> list[str]:
     """Register all enabled plugin tool modules. Returns the enabled keys."""
     enabled: list[str] = []
     for key, module_path in _PLUGIN_MODULES.items():
         module = importlib.import_module(module_path)
-        if not is_plugin_enabled(
-            key, plugins_setting, getattr(module, "DIST_PACKAGES", ())
-        ):
+        if not is_plugin_enabled(key, plugins_setting, getattr(module, "DIST_PACKAGES", ())):
             continue
         try:
             module.register(mcp)

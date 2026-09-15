@@ -5,14 +5,16 @@ Useful for an LLM to figure out *what* endpoints exist before calling them.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import client
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def nautobot_status() -> dict[str, Any]:
         """Return Nautobot's ``/api/status/`` document.
@@ -40,9 +42,7 @@ def register(mcp: FastMCP) -> None:
         Useful when working with custom fields, tags, relationships, or
         any feature scoped by content type.
         """
-        return await client().rest_list(
-            "/api/extras/content-types/", paginate=True
-        )
+        return await client().rest_list("/api/extras/content-types/", paginate=True)
 
     @mcp.tool()
     async def tenant_scope_info() -> dict[str, Any]:

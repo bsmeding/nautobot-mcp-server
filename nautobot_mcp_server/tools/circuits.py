@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client, lookup_id_or_name
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_circuits(
         filters: dict[str, Any] | None = None,
@@ -26,23 +28,17 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def get_circuit(cid_or_id: str) -> dict[str, Any]:
         """Fetch a circuit by UUID or by ``cid`` (circuit ID string)."""
-        return await lookup_id_or_name(
-            "/api/circuits/circuits/", cid_or_id, name_field="cid"
-        )
+        return await lookup_id_or_name("/api/circuits/circuits/", cid_or_id, name_field="cid")
 
     @mcp.tool()
     async def list_providers() -> Any:
         """List circuit providers."""
-        return await client().rest_list(
-            "/api/circuits/providers/", paginate=True
-        )
+        return await client().rest_list("/api/circuits/providers/", paginate=True)
 
     @mcp.tool()
     async def list_circuit_types() -> Any:
         """List circuit types."""
-        return await client().rest_list(
-            "/api/circuits/circuit-types/", paginate=True
-        )
+        return await client().rest_list("/api/circuits/circuit-types/", paginate=True)
 
     @mcp.tool()
     async def list_circuit_terminations(circuit_cid_or_id: str) -> Any:

@@ -7,9 +7,11 @@ models under ``/api/plugins/golden-config/``.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from .._helpers import client
 from ._common import list_jobs_matching, plugin_rest_list, run_job_by_name_or_id
@@ -19,7 +21,7 @@ DIST_PACKAGES: tuple[str, ...] = ("nautobot_golden_config",)
 APP_URL = "golden-config"
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_config_compliance(
         filters: dict[str, Any] | None = None,
@@ -47,9 +49,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_compliance_features(paginate: bool = True) -> Any:
         """List compliance features. Endpoint: ``.../compliance-feature/``."""
-        return await plugin_rest_list(
-            APP_URL, "compliance-feature", paginate=paginate
-        )
+        return await plugin_rest_list(APP_URL, "compliance-feature", paginate=paginate)
 
     @mcp.tool()
     async def list_golden_config(
@@ -61,16 +61,12 @@ def register(mcp: FastMCP) -> None:
         Endpoint: ``/api/plugins/golden-config/golden-config/``. Filter by
         ``device``.
         """
-        return await plugin_rest_list(
-            APP_URL, "golden-config", filters=filters, paginate=paginate
-        )
+        return await plugin_rest_list(APP_URL, "golden-config", filters=filters, paginate=paginate)
 
     @mcp.tool()
     async def list_golden_config_settings(paginate: bool = True) -> Any:
         """List Golden Config settings. Endpoint: ``.../golden-config-settings/``."""
-        return await plugin_rest_list(
-            APP_URL, "golden-config-settings", paginate=paginate
-        )
+        return await plugin_rest_list(APP_URL, "golden-config-settings", paginate=paginate)
 
     @mcp.tool()
     async def get_intended_config(device_id: str) -> Any:
@@ -78,9 +74,7 @@ def register(mcp: FastMCP) -> None:
 
         Endpoint: ``/api/plugins/golden-config/config-postprocessing/{device_id}/``.
         """
-        return await client().rest_get(
-            f"/api/plugins/{APP_URL}/config-postprocessing/{device_id}/"
-        )
+        return await client().rest_get(f"/api/plugins/{APP_URL}/config-postprocessing/{device_id}/")
 
     @mcp.tool()
     async def compliance_summary(
@@ -103,9 +97,7 @@ def register(mcp: FastMCP) -> None:
             filters["device"] = device
         if location:
             filters["device__location"] = location
-        rows = await plugin_rest_list(
-            APP_URL, "config-compliance", filters=filters, paginate=True
-        )
+        rows = await plugin_rest_list(APP_URL, "config-compliance", filters=filters, paginate=True)
         if isinstance(rows, dict):  # safety: unpaginated envelope
             rows = rows.get("results", [])
 
@@ -115,21 +107,15 @@ def register(mcp: FastMCP) -> None:
 
         for row in rows:
             dev = row.get("device") or {}
-            dev_name = (
-                dev.get("name") if isinstance(dev, dict) else str(dev)
-            ) or "<unknown>"
+            dev_name = (dev.get("name") if isinstance(dev, dict) else str(dev)) or "<unknown>"
             rule = row.get("rule") or {}
             feature = rule.get("feature") if isinstance(rule, dict) else None
             if isinstance(feature, dict):
                 feature = feature.get("name")
-            feature = feature or (
-                rule.get("name") if isinstance(rule, dict) else None
-            )
+            feature = feature or (rule.get("name") if isinstance(rule, dict) else None)
             is_ok = bool(row.get("compliance"))
 
-            bucket = per_device.setdefault(
-                dev_name, {"compliant": 0, "non_compliant": 0}
-            )
+            bucket = per_device.setdefault(dev_name, {"compliant": 0, "non_compliant": 0})
             if is_ok:
                 compliant_count += 1
                 bucket["compliant"] += 1

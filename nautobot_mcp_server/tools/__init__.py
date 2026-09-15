@@ -1,7 +1,7 @@
 """Tool registration for the Nautobot MCP server.
 
 Each submodule defines a ``register(mcp)`` function that attaches its
-tools to a :class:`mcp.server.fastmcp.FastMCP` instance.
+tools to a :class:`mcp.server.mcpserver.MCPServer` instance.
 """
 
 from __future__ import annotations
@@ -9,11 +9,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mcp.server.fastmcp import FastMCP
+    from mcp.server.mcpserver import MCPServer
 
 
-def register_all(mcp: FastMCP) -> None:
-    """Register every tool module with the given FastMCP server."""
+def register_all(mcp: MCPServer) -> None:
+    """Register every tool module with the given MCP server."""
     from . import (
         circuits,
         dcim,

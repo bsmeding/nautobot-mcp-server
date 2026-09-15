@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client, lookup_id_or_name
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     # ---- prefixes -----------------------------------------------------
 
     @mcp.tool()
@@ -37,9 +39,7 @@ def register(mcp: FastMCP) -> None:
             )
             results = (page or {}).get("results") or []
             if not results:
-                raise ValueError(
-                    f"No prefix found matching {prefix_or_id!r}"
-                ) from None
+                raise ValueError(f"No prefix found matching {prefix_or_id!r}") from None
             if len(results) > 1:
                 raise ValueError(
                     f"Ambiguous prefix lookup: multiple matches for {prefix_or_id!r}"
@@ -62,9 +62,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def get_available_prefixes(prefix_id: str) -> Any:
         """List available child prefixes inside a parent prefix."""
-        return await client().rest_get(
-            f"/api/ipam/prefixes/{prefix_id}/available-prefixes/"
-        )
+        return await client().rest_get(f"/api/ipam/prefixes/{prefix_id}/available-prefixes/")
 
     # ---- IP addresses -------------------------------------------------
 
@@ -94,9 +92,7 @@ def register(mcp: FastMCP) -> None:
             )
             results = (page or {}).get("results") or []
             if not results:
-                raise ValueError(
-                    f"No IP address found matching {address_or_id!r}"
-                ) from None
+                raise ValueError(f"No IP address found matching {address_or_id!r}") from None
             if len(results) > 1:
                 raise ValueError(
                     f"Ambiguous IP lookup: multiple matches for {address_or_id!r}"
@@ -126,9 +122,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_vlan_groups() -> Any:
         """List VLAN groups."""
-        return await client().rest_list(
-            "/api/ipam/vlan-groups/", paginate=True
-        )
+        return await client().rest_list("/api/ipam/vlan-groups/", paginate=True)
 
     # ---- VRFs / RIRs / Namespaces -------------------------------------
 
@@ -151,6 +145,4 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_namespaces() -> Any:
         """List IPAM namespaces (Nautobot 2.x)."""
-        return await client().rest_list(
-            "/api/ipam/namespaces/", paginate=True
-        )
+        return await client().rest_list("/api/ipam/namespaces/", paginate=True)

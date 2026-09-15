@@ -8,9 +8,11 @@ job-centric helpers for running designs.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._common import list_jobs_matching, plugin_rest_list, run_job_by_name_or_id
 
@@ -19,7 +21,7 @@ DIST_PACKAGES: tuple[str, ...] = ("nautobot_design_builder",)
 APP_URL = "design-builder"
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_designs(paginate: bool = True) -> Any:
         """List Design Builder designs (``/api/plugins/design-builder/designs/``)."""
@@ -34,9 +36,7 @@ def register(mcp: FastMCP) -> None:
 
         Endpoint: ``/api/plugins/design-builder/deployments/``.
         """
-        return await plugin_rest_list(
-            APP_URL, "deployments", filters=filters, paginate=paginate
-        )
+        return await plugin_rest_list(APP_URL, "deployments", filters=filters, paginate=paginate)
 
     @mcp.tool()
     async def list_design_jobs() -> Any:

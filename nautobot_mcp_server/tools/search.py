@@ -8,14 +8,16 @@ these patterns, fall back to ``rest_list``.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def search_devices(
         q: str | None = None,
@@ -41,9 +43,7 @@ def register(mcp: FastMCP) -> None:
                 "tag": tag,
             }
         )
-        return await client().rest_list(
-            "/api/dcim/devices/", filters=filters, limit=limit
-        )
+        return await client().rest_list("/api/dcim/devices/", filters=filters, limit=limit)
 
     @mcp.tool()
     async def search_ip_addresses(
@@ -66,9 +66,7 @@ def register(mcp: FastMCP) -> None:
                 "family": family,
             }
         )
-        return await client().rest_list(
-            "/api/ipam/ip-addresses/", filters=filters, limit=limit
-        )
+        return await client().rest_list("/api/ipam/ip-addresses/", filters=filters, limit=limit)
 
     @mcp.tool()
     async def search_prefixes(
@@ -93,9 +91,7 @@ def register(mcp: FastMCP) -> None:
                 "within": within,
             }
         )
-        return await client().rest_list(
-            "/api/ipam/prefixes/", filters=filters, limit=limit
-        )
+        return await client().rest_list("/api/ipam/prefixes/", filters=filters, limit=limit)
 
     @mcp.tool()
     async def search_locations(
@@ -114,9 +110,7 @@ def register(mcp: FastMCP) -> None:
                 "parent": parent,
             }
         )
-        return await client().rest_list(
-            "/api/dcim/locations/", filters=filters, limit=limit
-        )
+        return await client().rest_list("/api/dcim/locations/", filters=filters, limit=limit)
 
     @mcp.tool()
     async def search_circuits(
@@ -137,6 +131,4 @@ def register(mcp: FastMCP) -> None:
                 "tenant": tenant,
             }
         )
-        return await client().rest_list(
-            "/api/circuits/circuits/", filters=filters, limit=limit
-        )
+        return await client().rest_list("/api/circuits/circuits/", filters=filters, limit=limit)

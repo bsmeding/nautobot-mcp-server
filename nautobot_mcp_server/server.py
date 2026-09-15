@@ -20,6 +20,7 @@ import sys
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any
 
+from . import __version__
 from .client import NautobotClient
 from .config import NautobotMcpSettings, load_settings
 from .logging_config import configure_logging
@@ -28,19 +29,19 @@ from .runtime import set_client, set_settings
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from mcp.server.fastmcp import FastMCP
+    from mcp.server.mcpserver import MCPServer
 
 logger = logging.getLogger("nautobot_mcp_server.server")
 
 
-def build_server(settings: NautobotMcpSettings | None = None) -> FastMCP:
-    """Construct a configured FastMCP server.
+def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
+    """Construct a configured MCP server.
 
     The actual NautobotClient is created in the ``lifespan`` so the
     HTTP connection is opened only when the server starts (this matters
     for cleanly closing the client on shutdown).
     """
-    from mcp.server.fastmcp import FastMCP  # local import keeps import cost low
+    from mcp.server.mcpserver import MCPServer  # local import keeps import cost low
 
     from .tools import register_all
 
@@ -50,7 +51,7 @@ def build_server(settings: NautobotMcpSettings | None = None) -> FastMCP:
     logger.info("Nautobot MCP server starting; settings=%s", resolved.redacted())
 
     @asynccontextmanager
-    async def lifespan(_server: FastMCP) -> AsyncIterator[dict[str, Any]]:
+    async def lifespan(_server: MCPServer) -> AsyncIterator[dict[str, Any]]:
         client = NautobotClient(resolved)
         set_client(client)
         try:
@@ -59,7 +60,7 @@ def build_server(settings: NautobotMcpSettings | None = None) -> FastMCP:
             await client.aclose()
             logger.info("Nautobot MCP server shut down cleanly")
 
-    mcp = FastMCP(
+    mcp = MCPServer(
         "nautobot-mcp-server",
         instructions=(
             "Tools for interacting with a Nautobot instance via its built-in "
@@ -69,6 +70,7 @@ def build_server(settings: NautobotMcpSettings | None = None) -> FastMCP:
             "back to the generic `rest_list` / `rest_get` tools for any "
             "endpoint not covered by a wrapper."
         ),
+        version=__version__,
         lifespan=lifespan,
     )
 

@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_users(
         filters: dict[str, Any] | None = None,
@@ -28,13 +30,9 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_groups() -> Any:
         """List user groups."""
-        return await client().rest_list(
-            "/api/users/groups/", paginate=True
-        )
+        return await client().rest_list("/api/users/groups/", paginate=True)
 
     @mcp.tool()
     async def list_object_permissions() -> Any:
         """List object permission definitions."""
-        return await client().rest_list(
-            "/api/users/permissions/", paginate=True
-        )
+        return await client().rest_list("/api/users/permissions/", paginate=True)

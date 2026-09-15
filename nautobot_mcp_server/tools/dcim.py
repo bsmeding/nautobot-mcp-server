@@ -6,14 +6,16 @@ platforms, and cables.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client, lookup_id_or_name
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     # ---- devices -------------------------------------------------------
 
     @mcp.tool()
@@ -50,9 +52,7 @@ def register(mcp: FastMCP) -> None:
         device = await lookup_id_or_name("/api/dcim/devices/", device_name_or_id)
         merged = clean_filters(filters)
         merged["device_id"] = device["id"]
-        return await client().rest_list(
-            "/api/dcim/interfaces/", filters=merged, paginate=paginate
-        )
+        return await client().rest_list("/api/dcim/interfaces/", filters=merged, paginate=paginate)
 
     @mcp.tool()
     async def get_device_config_context(device_name_or_id: str) -> dict[str, Any]:
@@ -105,9 +105,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_location_types() -> Any:
         """List location types (the hierarchy levels: Region, Site, ...)."""
-        return await client().rest_list(
-            "/api/dcim/location-types/", paginate=True
-        )
+        return await client().rest_list("/api/dcim/location-types/", paginate=True)
 
     @mcp.tool()
     async def list_racks(
@@ -130,9 +128,7 @@ def register(mcp: FastMCP) -> None:
     async def get_rack_elevation(rack_name_or_id: str) -> Any:
         """Return the elevation (unit-by-unit layout) of a rack."""
         rack = await lookup_id_or_name("/api/dcim/racks/", rack_name_or_id)
-        return await client().rest_get(
-            f"/api/dcim/racks/{rack['id']}/elevation/"
-        )
+        return await client().rest_get(f"/api/dcim/racks/{rack['id']}/elevation/")
 
     # ---- device types & roles -----------------------------------------
 
@@ -155,23 +151,17 @@ def register(mcp: FastMCP) -> None:
         """List device roles (now ``/api/extras/roles/?content_types=dcim.device``)."""
         merged = clean_filters(filters)
         merged.setdefault("content_types", "dcim.device")
-        return await client().rest_list(
-            "/api/extras/roles/", filters=merged, paginate=True
-        )
+        return await client().rest_list("/api/extras/roles/", filters=merged, paginate=True)
 
     @mcp.tool()
     async def list_manufacturers() -> Any:
         """List device manufacturers."""
-        return await client().rest_list(
-            "/api/dcim/manufacturers/", paginate=True
-        )
+        return await client().rest_list("/api/dcim/manufacturers/", paginate=True)
 
     @mcp.tool()
     async def list_platforms() -> Any:
         """List platforms (network OS families)."""
-        return await client().rest_list(
-            "/api/dcim/platforms/", paginate=True
-        )
+        return await client().rest_list("/api/dcim/platforms/", paginate=True)
 
     # ---- cables -------------------------------------------------------
 

@@ -12,9 +12,11 @@ is present and how it is wired up.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from .._helpers import client
 
@@ -22,7 +24,7 @@ KEY = "nornir"
 DIST_PACKAGES: tuple[str, ...] = ("nautobot_plugin_nornir",)
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def nornir_plugin_info() -> dict[str, Any]:
         """Report the Nautobot Nornir backend's presence and configuration.
@@ -34,9 +36,7 @@ def register(mcp: FastMCP) -> None:
         Config or Onboarding jobs that depend on Nornir.
         """
         status = await client().status()
-        installed_apps = status.get("installed-apps") or status.get(
-            "installed_apps"
-        ) or {}
+        installed_apps = status.get("installed-apps") or status.get("installed_apps") or {}
         present = "nautobot_plugin_nornir" in installed_apps
         plugins_cfg = status.get("plugins") or {}
         return {

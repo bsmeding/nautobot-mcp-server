@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client, lookup_id_or_name
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def list_virtual_machines(
         filters: dict[str, Any] | None = None,
@@ -26,9 +28,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def get_virtual_machine(name_or_id: str) -> dict[str, Any]:
         """Fetch a virtual machine by UUID or name."""
-        return await lookup_id_or_name(
-            "/api/virtualization/virtual-machines/", name_or_id
-        )
+        return await lookup_id_or_name("/api/virtualization/virtual-machines/", name_or_id)
 
     @mcp.tool()
     async def list_clusters(
@@ -46,9 +46,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_cluster_types() -> Any:
         """List cluster types."""
-        return await client().rest_list(
-            "/api/virtualization/cluster-types/", paginate=True
-        )
+        return await client().rest_list("/api/virtualization/cluster-types/", paginate=True)
 
     @mcp.tool()
     async def get_vm_interfaces(
@@ -56,9 +54,7 @@ def register(mcp: FastMCP) -> None:
         paginate: bool = True,
     ) -> Any:
         """List interfaces on a virtual machine."""
-        vm = await lookup_id_or_name(
-            "/api/virtualization/virtual-machines/", vm_name_or_id
-        )
+        vm = await lookup_id_or_name("/api/virtualization/virtual-machines/", vm_name_or_id)
         return await client().rest_list(
             "/api/virtualization/interfaces/",
             filters={"virtual_machine_id": vm["id"]},

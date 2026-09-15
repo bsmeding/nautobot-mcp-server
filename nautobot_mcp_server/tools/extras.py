@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client, lookup_id_or_name
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     # ---- jobs ---------------------------------------------------------
 
     @mcp.tool()
@@ -61,18 +63,14 @@ def register(mcp: FastMCP) -> None:
         # own per-job permissions, so we route it through the underlying
         # httpx client instead of the write-gated _request().
         cli = client()
-        resp = await cli._client.post(
-            f"/api/extras/jobs/{job['id']}/run/", json=payload
-        )
+        resp = await cli._client.post(f"/api/extras/jobs/{job['id']}/run/", json=payload)
         resp.raise_for_status()
         return resp.json()
 
     @mcp.tool()
     async def get_job_result(result_id: str) -> dict[str, Any]:
         """Fetch a single job result by UUID."""
-        return await client().rest_get_object(
-            "/api/extras/job-results/", result_id
-        )
+        return await client().rest_get_object("/api/extras/job-results/", result_id)
 
     @mcp.tool()
     async def list_recent_job_results(
@@ -110,9 +108,7 @@ def register(mcp: FastMCP) -> None:
         filters: dict[str, Any] = {}
         if content_type:
             filters["content_types"] = content_type
-        return await client().rest_list(
-            "/api/extras/statuses/", filters=filters, paginate=True
-        )
+        return await client().rest_list("/api/extras/statuses/", filters=filters, paginate=True)
 
     @mcp.tool()
     async def list_tags(
@@ -122,9 +118,7 @@ def register(mcp: FastMCP) -> None:
         filters: dict[str, Any] = {}
         if content_type:
             filters["content_types"] = content_type
-        return await client().rest_list(
-            "/api/extras/tags/", filters=filters, paginate=True
-        )
+        return await client().rest_list("/api/extras/tags/", filters=filters, paginate=True)
 
     @mcp.tool()
     async def list_roles(
@@ -134,9 +128,7 @@ def register(mcp: FastMCP) -> None:
         filters: dict[str, Any] = {}
         if content_type:
             filters["content_types"] = content_type
-        return await client().rest_list(
-            "/api/extras/roles/", filters=filters, paginate=True
-        )
+        return await client().rest_list("/api/extras/roles/", filters=filters, paginate=True)
 
     # ---- custom fields, relationships, computed fields ---------------
 
@@ -155,9 +147,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_relationships() -> Any:
         """List relationship definitions."""
-        return await client().rest_list(
-            "/api/extras/relationships/", paginate=True
-        )
+        return await client().rest_list("/api/extras/relationships/", paginate=True)
 
     @mcp.tool()
     async def list_computed_fields(
@@ -187,13 +177,9 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_webhooks() -> Any:
         """List webhook definitions."""
-        return await client().rest_list(
-            "/api/extras/webhooks/", paginate=True
-        )
+        return await client().rest_list("/api/extras/webhooks/", paginate=True)
 
     @mcp.tool()
     async def list_secrets_groups() -> Any:
         """List secrets groups (does not return secret values)."""
-        return await client().rest_list(
-            "/api/extras/secrets-groups/", paginate=True
-        )
+        return await client().rest_list("/api/extras/secrets-groups/", paginate=True)

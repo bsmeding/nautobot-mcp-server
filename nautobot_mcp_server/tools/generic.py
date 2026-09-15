@@ -7,14 +7,16 @@ access".
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import FastMCP
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+
 
 from ._helpers import clean_filters, client
 
 
-def register(mcp: FastMCP) -> None:
+def register(mcp: MCPServer) -> None:
     @mcp.tool()
     async def rest_list(
         endpoint: str,
@@ -78,9 +80,7 @@ def register(mcp: FastMCP) -> None:
 
         Requires writes to be enabled.
         """
-        return await client().rest_update(
-            endpoint, object_id, data, partial=partial
-        )
+        return await client().rest_update(endpoint, object_id, data, partial=partial)
 
     @mcp.tool()
     async def rest_delete(endpoint: str, object_id: str) -> dict[str, Any]:
