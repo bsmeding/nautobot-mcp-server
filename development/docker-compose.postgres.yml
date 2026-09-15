@@ -2,7 +2,7 @@
 # PostgreSQL backend for the development environment.
 services:
   db:
-    image: "postgres:16-alpine"
+    image: "postgres:18-alpine"
     env_file:
       - "development.env"
       - "creds.env"
