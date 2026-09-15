@@ -2,7 +2,7 @@
 # Redis backend (cache + celery broker) for the development environment.
 services:
   redis:
-    image: "redis:7-alpine"
+    image: "redis:8-alpine"
     command:
       - "sh"
       - "-c"
