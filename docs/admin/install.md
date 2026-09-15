@@ -6,7 +6,7 @@ Install into your Nautobot environment (pin a compatible Nautobot via the
 `nautobot` extra):
 
 ```bash
-pip install "nautobot-mcp-server[nautobot]"
+pip install "nautobot-mcp[nautobot]"
 ```
 
 Enable and configure it in `nautobot_config.py`:

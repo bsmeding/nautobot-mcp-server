@@ -3,7 +3,7 @@
 ## Standalone MCP server
 
 ```bash
-pip install nautobot-mcp-server
+pip install nautobot-mcp
 
 export NAUTOBOT_URL="https://nautobot.example.com"
 export NAUTOBOT_TOKEN="YOUR_API_TOKEN"

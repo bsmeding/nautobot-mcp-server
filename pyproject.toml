@@ -3,8 +3,8 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nautobot-mcp-server"
-version = "0.2.1"
+name = "nautobot-mcp"
+version = "0.2.2"
 description = "Nautobot app and Model Context Protocol (MCP) server exposing Nautobot's REST and GraphQL APIs to LLMs."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -36,7 +36,7 @@ classifiers = [
   "Topic :: System :: Networking :: Monitoring",
 ]
 dependencies = [
-  "mcp>=1.2.0,<2.0",
+  "mcp>=1.28.1,<2.0",
   "httpx>=0.27.0",
 ]
 
@@ -94,6 +94,17 @@ Homepage = "https://github.com/bsmeding/nautobot-mcp-server"
 Repository = "https://github.com/bsmeding/nautobot-mcp-server"
 Issues = "https://github.com/bsmeding/nautobot-mcp-server/issues"
 Changelog = "https://github.com/bsmeding/nautobot-mcp-server/releases"
+
+# Keep the lockfile (and optional extras) on patched transitives flagged by
+# Dependabot. These are pulled in via Nautobot / plugin extras, not the
+# standalone MCP server runtime.
+[tool.uv]
+constraint-dependencies = [
+  "GitPython>=3.1.59",
+  "sqlparse>=0.6.0",
+  "djangorestframework>=3.17.2",
+  "cryptography>=50.0.0",
+]
 
 [tool.setuptools]
 include-package-data = true

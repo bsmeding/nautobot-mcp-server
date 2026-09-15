@@ -21,15 +21,18 @@ tools work against their endpoints if your token has access.
 
 ## Installation
 
+Published on PyPI as [`nautobot-mcp`](https://pypi.org/project/nautobot-mcp/).
+The console script remains `nautobot-mcp-server`.
+
 ```bash
-pip install nautobot-mcp-server
+pip install nautobot-mcp
 ```
 
 When running inside a Nautobot environment, install the optional `nautobot`
 extra (it pins a compatible Nautobot version):
 
 ```bash
-pip install "nautobot-mcp-server[nautobot]"
+pip install "nautobot-mcp[nautobot]"
 ```
 
 ### Optional Nautobot app (plugin) integrations
@@ -38,12 +41,12 @@ The base install exposes only Nautobot **core** tools. Tools for the
 NetworkToCode apps are optional and can be added via extras:
 
 ```bash
-pip install "nautobot-mcp-server[design-builder]"   # Design Builder tools
-pip install "nautobot-mcp-server[onboarding]"        # Device Onboarding tools
-pip install "nautobot-mcp-server[ssot]"              # SSoT tools
-pip install "nautobot-mcp-server[golden-config]"     # Golden Config tools
-pip install "nautobot-mcp-server[nornir]"            # Nornir backend tools
-pip install "nautobot-mcp-server[all]"               # all of the above
+pip install "nautobot-mcp[design-builder]"   # Design Builder tools
+pip install "nautobot-mcp[onboarding]"        # Device Onboarding tools
+pip install "nautobot-mcp[ssot]"              # SSoT tools
+pip install "nautobot-mcp[golden-config]"     # Golden Config tools
+pip install "nautobot-mcp[nornir]"            # Nornir backend tools
+pip install "nautobot-mcp[all]"               # all of the above
 ```
 
 By default (`plugins = ["auto"]`) a plugin's tools are registered when its

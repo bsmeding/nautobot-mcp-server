@@ -18,7 +18,7 @@ __all__ = ["__version__", "config"]
 
 def _resolve_version() -> str:
     """Resolve the installed package version, with fallbacks."""
-    for dist_name in ("nautobot-mcp-server", "nautobot-app-mcp-server", __name__):
+    for dist_name in ("nautobot-mcp", "nautobot-mcp-server", "nautobot-app-mcp-server", __name__):
         try:
             return metadata.version(dist_name)
         except metadata.PackageNotFoundError:

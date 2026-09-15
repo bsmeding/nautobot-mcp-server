@@ -9,7 +9,7 @@ by :func:`is_plugin_enabled` from the ``plugins`` setting:
 
 * ``"auto"`` (default) -- enable the plugin when its Python package is
   importable in this environment. This pairs with the pip extras, e.g.
-  ``pip install nautobot-mcp-server[design-builder]``.
+  ``pip install nautobot-mcp[design-builder]``.
 * an explicit key (``"design_builder"``, ``"onboarding"``, ``"ssot"``) --
   force-enable that plugin even if the package is not importable locally
   (useful for a standalone MCP server talking to a *remote* Nautobot that

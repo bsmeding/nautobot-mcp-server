@@ -4,12 +4,12 @@ The base install exposes only Nautobot **core** tools. Tools for the
 NetworkToCode apps are optional and installed via extras:
 
 ```bash
-pip install "nautobot-mcp-server[design-builder]"
-pip install "nautobot-mcp-server[onboarding]"
-pip install "nautobot-mcp-server[ssot]"
-pip install "nautobot-mcp-server[golden-config]"
-pip install "nautobot-mcp-server[nornir]"
-pip install "nautobot-mcp-server[all]"
+pip install "nautobot-mcp[design-builder]"
+pip install "nautobot-mcp[onboarding]"
+pip install "nautobot-mcp[ssot]"
+pip install "nautobot-mcp[golden-config]"
+pip install "nautobot-mcp[nornir]"
+pip install "nautobot-mcp[all]"
 ```
 
 ## Enabling
