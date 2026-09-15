@@ -1,13 +1,12 @@
 name: Release
 
-# Publish the MCP server package to PyPI when a GitHub Release is published
+# Publish to PyPI when a GitHub Release is published. Do not also trigger on
+# tag pushes — creating a Release creates the tag, and dual triggers caused
+# a failed OIDC attempt before the successful publish on v0.2.1.
 
 on:
   release:
     types: [published]
-  push:
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
 
 permissions:
