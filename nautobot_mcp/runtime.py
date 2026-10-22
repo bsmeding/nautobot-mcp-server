@@ -30,7 +30,7 @@ def get_client() -> NautobotClient:
     if _client is None:
         raise RuntimeError(
             "NautobotClient is not initialized. The MCP server must be "
-            "started via nautobot_mcp_server.server.main()."
+            "started via nautobot_mcp.server.main()."
         )
     return _client
 

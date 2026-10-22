@@ -6,7 +6,7 @@ for LLMs and AI assistants.
 
 It can run two ways:
 
-- **As a Nautobot app** — add `nautobot_mcp_server` to `PLUGINS` and configure
+- **As a Nautobot app** — add `nautobot_mcp` to `PLUGINS` and configure
   it via `PLUGINS_CONFIG`.
 - **As a standalone MCP server** — run the `nautobot-mcp-server` console script
   against any reachable Nautobot, configured with environment variables.

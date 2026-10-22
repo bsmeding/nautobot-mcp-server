@@ -1,5 +1,12 @@
 # Release Notes
 
+## v0.2.3
+
+- Rename the Python package and Nautobot plugin from `nautobot_mcp_server` to
+  `nautobot_mcp`. Use `PLUGINS = ["nautobot_mcp"]` and
+  `PLUGINS_CONFIG["nautobot_mcp"]`.
+- The `nautobot-mcp-server` console script is unchanged.
+
 ## v0.2.2
 
 - Publish on PyPI as `nautobot-mcp` (the `nautobot-mcp-server` console script

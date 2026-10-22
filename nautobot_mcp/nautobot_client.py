@@ -1,8 +1,8 @@
 """Deprecated module — kept for backwards compatibility.
 
-The implementation moved to :mod:`nautobot_mcp_server.client`. This shim
+The implementation moved to :mod:`nautobot_mcp.client`. This shim
 re-exports :class:`NautobotClient` so that any external code importing
-``from nautobot_mcp_server.nautobot_client import NautobotClient``
+``from nautobot_mcp.nautobot_client import NautobotClient``
 keeps working.
 
 Will be removed in a future major release.
@@ -17,8 +17,8 @@ from .client import NautobotClient
 __all__ = ["NautobotClient"]
 
 warnings.warn(
-    "nautobot_mcp_server.nautobot_client is deprecated; "
-    "import from nautobot_mcp_server.client instead.",
+    "nautobot_mcp.nautobot_client is deprecated; "
+    "import from nautobot_mcp.client instead.",
     DeprecationWarning,
     stacklevel=2,
 )

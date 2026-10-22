@@ -17,7 +17,7 @@ menu_items = (
                 weight=150,
                 items=(
                     NavMenuItem(
-                        link="plugins:nautobot_mcp_server:home",
+                        link="plugins:nautobot_mcp:home",
                         name="MCP Server Status",
                         permissions=[],
                     ),

@@ -45,10 +45,10 @@ CACHES = {
 CELERY_BROKER_URL = f"{redis_url}/0"
 
 # --- Enable this app -------------------------------------------------------
-PLUGINS = ["nautobot_mcp_server"]
+PLUGINS = ["nautobot_mcp"]
 
 PLUGINS_CONFIG = {
-    "nautobot_mcp_server": {
+    "nautobot_mcp": {
         "nautobot_url": _env("NAUTOBOT_URL", "http://localhost:8080"),
         "nautobot_token": _env("NAUTOBOT_TOKEN", ""),
         "allow_writes": is_truthy(_env("NAUTOBOT_MCP_ALLOW_WRITES", "False")),

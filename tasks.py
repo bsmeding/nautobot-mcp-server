@@ -40,7 +40,7 @@ COMPOSE_FILES = [
 
 def _compose_cmd() -> str:
     files = " ".join(f"-f {f}" for f in COMPOSE_FILES)
-    return f"docker compose --project-name nautobot_mcp_server {files}"
+    return f"docker compose --project-name nautobot_mcp {files}"
 
 
 def _run_compose(context, command: str, **kwargs) -> None:
@@ -125,14 +125,14 @@ def cli(context):
 @task
 def lint(context):
     """Run ruff lint checks."""
-    context.run("ruff check nautobot_mcp_server tests", pty=True)
+    context.run("ruff check nautobot_mcp tests", pty=True)
 
 
 @task
 def format(context):  # matches NTC task naming
     """Auto-format and apply safe lint fixes with ruff."""
-    context.run("ruff format nautobot_mcp_server tests", pty=True)
-    context.run("ruff check --fix nautobot_mcp_server tests", pty=True)
+    context.run("ruff format nautobot_mcp tests", pty=True)
+    context.run("ruff check --fix nautobot_mcp tests", pty=True)
 
 
 @task

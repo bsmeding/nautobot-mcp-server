@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from nautobot_mcp_server.config import load_settings
-from nautobot_mcp_server.tools import plugins
+from nautobot_mcp.config import load_settings
+from nautobot_mcp.tools import plugins
 
 
 class FakeMCP:

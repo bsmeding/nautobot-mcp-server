@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 import sys
 
-LOGGER_NAME = "nautobot_mcp_server"
+LOGGER_NAME = "nautobot_mcp"
 
 
 def configure_logging(level: str = "INFO") -> logging.Logger:

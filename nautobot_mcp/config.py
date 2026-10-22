@@ -7,7 +7,7 @@ Resolution order (highest priority first):
    ``NAUTOBOT_MCP_*`` settings below). Unprefixed legacy aliases
    (``NAUTOBOT_ALLOW_WRITES``, ``NAUTOBOT_TENANT_SCOPE``, …) are still
    accepted but the ``NAUTOBOT_MCP_*`` form wins when both are set.
-3. ``settings.PLUGINS_CONFIG["nautobot_mcp_server"]`` when running inside
+3. ``settings.PLUGINS_CONFIG["nautobot_mcp"]`` when running inside
    Nautobot/Django.
 """
 
@@ -78,7 +78,7 @@ def _from_django_settings() -> dict[str, Any]:
         return {}
     try:
         plugins_config = getattr(settings, "PLUGINS_CONFIG", {}) or {}
-        cfg = plugins_config.get("nautobot_mcp_server", {}) or {}
+        cfg = plugins_config.get("nautobot_mcp", {}) or {}
         return dict(cfg)
     except Exception:
         return {}
@@ -187,12 +187,12 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
     if not url:
         raise ValueError(
             "Nautobot URL is not configured. Set the NAUTOBOT_URL env var "
-            "or PLUGINS_CONFIG['nautobot_mcp_server']['nautobot_url']."
+            "or PLUGINS_CONFIG['nautobot_mcp']['nautobot_url']."
         )
     if not token:
         raise ValueError(
             "Nautobot API token is not configured. Set the NAUTOBOT_TOKEN env "
-            "var or PLUGINS_CONFIG['nautobot_mcp_server']['nautobot_token']."
+            "var or PLUGINS_CONFIG['nautobot_mcp']['nautobot_token']."
         )
 
     return NautobotMcpSettings(

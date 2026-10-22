@@ -3,7 +3,7 @@
 In MSP / multi-tenant deployments a single MCP server (and a single
 Nautobot token) may serve agents that must only ever see one customer's
 data. When ``tenant_scope`` / ``tenant_group_scope`` are configured, the
-:class:`~nautobot_mcp_server.client.NautobotClient` enforces those limits
+:class:`~nautobot_mcp.client.NautobotClient` enforces those limits
 centrally so an agent cannot cross customer boundaries -- regardless of
 the filters it passes.
 

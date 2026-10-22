@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nautobot_mcp_server.config import NautobotMcpSettings, load_settings
+from nautobot_mcp.config import NautobotMcpSettings, load_settings
 
 
 def test_load_settings_from_kwargs() -> None:

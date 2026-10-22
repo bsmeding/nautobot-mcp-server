@@ -27,7 +27,7 @@ from .tenant import (
     tenant_id_of,
 )
 
-logger = logging.getLogger("nautobot_mcp_server.client")
+logger = logging.getLogger("nautobot_mcp.client")
 
 _WRITE_METHODS: frozenset[str] = frozenset({"POST", "PATCH", "PUT", "DELETE"})
 

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from nautobot_mcp_server.client import NautobotClient
-from nautobot_mcp_server.config import NautobotMcpSettings
+from nautobot_mcp.client import NautobotClient
+from nautobot_mcp.config import NautobotMcpSettings
 
 
 @pytest.fixture

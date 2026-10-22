@@ -21,7 +21,7 @@ from . import __version__
 class MCPServerHomeView(LoginRequiredMixin, TemplateView):
     """Operational status page for the MCP server."""
 
-    template_name = "nautobot_mcp_server/home.html"
+    template_name = "nautobot_mcp/home.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)

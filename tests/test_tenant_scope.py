@@ -6,8 +6,8 @@ import httpx
 import pytest
 import respx
 
-from nautobot_mcp_server.client import NautobotClient
-from nautobot_mcp_server.config import NautobotMcpSettings, load_settings
+from nautobot_mcp.client import NautobotClient
+from nautobot_mcp.config import NautobotMcpSettings, load_settings
 
 pytestmark = pytest.mark.asyncio
 

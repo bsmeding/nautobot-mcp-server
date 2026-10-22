@@ -1,0 +1,43 @@
+name: Publish rename shim
+
+# One-time publish of the old PyPI project (nautobot-mcp-server) so its page
+# says the name changed and `pip install nautobot-mcp-server` installs
+# nautobot-mcp. Do not run this again after 0.2.2 of the old name exists.
+#
+# PyPI trusted publishing on project nautobot-mcp-server must allow this
+# workflow (publish-rename-shim.yml) in the pypi environment.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish nautobot-mcp-server shim
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/nautobot-mcp-server/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Build shim
+        working-directory: legacy/nautobot-mcp-server
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build
+          twine check dist/*
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: legacy/nautobot-mcp-server/dist/

@@ -30,7 +30,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Ruff
-        run: ruff check nautobot_mcp_server tests
+        run: ruff check nautobot_mcp tests
 
       - name: Pytest
         run: pytest -v

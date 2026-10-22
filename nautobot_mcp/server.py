@@ -6,7 +6,7 @@ Run as a stdio MCP server::
 
 Or programmatically::
 
-    from nautobot_mcp_server.server import build_server, main
+    from nautobot_mcp.server import build_server, main
     main()
 """
 
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
     from mcp.server.mcpserver import MCPServer
 
-logger = logging.getLogger("nautobot_mcp_server.server")
+logger = logging.getLogger("nautobot_mcp.server")
 
 
 def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:

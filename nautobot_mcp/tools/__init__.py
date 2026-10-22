@@ -41,7 +41,7 @@ def register_all(mcp: MCPServer) -> None:
     search.register(mcp)
 
     # Optional Nautobot app (plugin) integrations -- gated by the ``plugins``
-    # setting (see nautobot_mcp_server.tools.plugins).
+    # setting (see nautobot_mcp.tools.plugins).
     from ..runtime import get_settings, set_enabled_plugins
     from . import plugins
 

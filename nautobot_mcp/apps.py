@@ -1,4 +1,4 @@
-"""Nautobot/Django app configuration for nautobot-mcp-server.
+"""Nautobot/Django app configuration for nautobot-mcp.
 
 This module is imported only when running inside a Nautobot environment.
 It is safe to fail to import when Nautobot is not installed; the standalone
@@ -15,7 +15,7 @@ from . import __version__
 class NautobotMcpServerConfig(NautobotAppConfig):
     """Nautobot app configuration for the MCP Server."""
 
-    name = "nautobot_mcp_server"
+    name = "nautobot_mcp"
     verbose_name = "Nautobot MCP Server"
     version = __version__
     author = "bsmeding"

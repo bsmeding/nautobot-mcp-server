@@ -9,8 +9,8 @@ pip install -e ".[dev]"
 ## Quality gates
 
 ```bash
-ruff check nautobot_mcp_server tests   # or: invoke lint
-ruff format nautobot_mcp_server tests  # or: invoke format
+ruff check nautobot_mcp tests   # or: invoke lint
+ruff format nautobot_mcp tests  # or: invoke format
 pytest -v                              # or: invoke unittest
 ```
 
@@ -24,7 +24,7 @@ pytest -v                              # or: invoke unittest
   `RUF`).
 - Tests use `pytest` + `respx` to mock Nautobot's HTTP API; no live Nautobot is
   required for the unit suite.
-- New tools live under `nautobot_mcp_server/tools/`; each module exposes a
+- New tools live under `nautobot_mcp/tools/`; each module exposes a
   `register(mcp)` function. Plugin integrations go under `tools/plugins/` and
   self-gate via `DIST_PACKAGES` (see
   [Plugin Integrations](../user/plugins.md)).

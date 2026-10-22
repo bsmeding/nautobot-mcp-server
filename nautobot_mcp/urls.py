@@ -10,7 +10,7 @@ from django.urls import path
 
 from . import views
 
-app_name = "nautobot_mcp_server"
+app_name = "nautobot_mcp"
 
 urlpatterns = [
     path("", views.MCPServerHomeView.as_view(), name="home"),

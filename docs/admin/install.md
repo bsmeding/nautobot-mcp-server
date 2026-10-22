@@ -12,10 +12,10 @@ pip install "nautobot-mcp[nautobot]"
 Enable and configure it in `nautobot_config.py`:
 
 ```python
-PLUGINS = ["nautobot_mcp_server"]
+PLUGINS = ["nautobot_mcp"]
 
 PLUGINS_CONFIG = {
-    "nautobot_mcp_server": {
+    "nautobot_mcp": {
         "nautobot_url": "https://nautobot.example.com",
         "nautobot_token": "YOUR_API_TOKEN",
         "verify_ssl": True,

@@ -6,10 +6,10 @@ import httpx
 import pytest
 import respx
 
-from nautobot_mcp_server import runtime
-from nautobot_mcp_server.client import NautobotClient
-from nautobot_mcp_server.config import NautobotMcpSettings
-from nautobot_mcp_server.tools.plugins import (
+from nautobot_mcp import runtime
+from nautobot_mcp.client import NautobotClient
+from nautobot_mcp.config import NautobotMcpSettings
+from nautobot_mcp.tools.plugins import (
     design_builder,
     golden_config,
     nornir,

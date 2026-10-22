@@ -6,7 +6,7 @@ REST and GraphQL APIs as tools for LLMs and AI assistants.
 Can be used in two ways:
 
 1. As a Nautobot app (installed in a Nautobot environment): set
-   ``PLUGINS = ["nautobot_mcp_server"]`` and configure ``PLUGINS_CONFIG``.
+   ``PLUGINS = ["nautobot_mcp"]`` and configure ``PLUGINS_CONFIG``.
 2. As a standalone MCP stdio server via the ``nautobot-mcp-server`` console
    script, configured with ``NAUTOBOT_URL`` / ``NAUTOBOT_TOKEN`` env vars.
 """

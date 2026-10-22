@@ -1,4 +1,4 @@
-# nautobot-mcp-server
+# nautobot-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes
 [Nautobot](https://docs.nautobot.com/)'s built-in REST and GraphQL APIs as
@@ -22,7 +22,12 @@ tools work against their endpoints if your token has access.
 ## Installation
 
 Published on PyPI as [`nautobot-mcp`](https://pypi.org/project/nautobot-mcp/).
-The console script remains `nautobot-mcp-server`.
+The Nautobot plugin name is `nautobot_mcp`. The console script remains
+`nautobot-mcp-server`.
+
+The previous PyPI project
+[`nautobot-mcp-server`](https://pypi.org/project/nautobot-mcp-server/)
+is a compatibility shim: installing it installs this package.
 
 ```bash
 pip install nautobot-mcp
@@ -69,10 +74,10 @@ available.
 In your `nautobot_config.py`:
 
 ```python
-PLUGINS = ["nautobot_mcp_server"]
+PLUGINS = ["nautobot_mcp"]
 
 PLUGINS_CONFIG = {
-    "nautobot_mcp_server": {
+    "nautobot_mcp": {
         "nautobot_url": "https://nautobot.example.com",
         "nautobot_token": "YOUR_API_TOKEN",
         "verify_ssl": True,
@@ -288,7 +293,7 @@ Registered only when the matching plugin is enabled (see
 
 ```bash
 pip install -e ".[dev]"
-ruff check nautobot_mcp_server tests
+ruff check nautobot_mcp tests
 pytest -v
 python -m build
 ```

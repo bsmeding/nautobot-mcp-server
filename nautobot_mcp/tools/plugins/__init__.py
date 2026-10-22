@@ -33,15 +33,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from mcp.server.mcpserver import MCPServer
 
-logger = logging.getLogger("nautobot_mcp_server.tools.plugins")
+logger = logging.getLogger("nautobot_mcp.tools.plugins")
 
 # Canonical plugin key -> module providing its tools.
 _PLUGIN_MODULES: dict[str, str] = {
-    "design_builder": "nautobot_mcp_server.tools.plugins.design_builder",
-    "onboarding": "nautobot_mcp_server.tools.plugins.onboarding",
-    "ssot": "nautobot_mcp_server.tools.plugins.ssot",
-    "golden_config": "nautobot_mcp_server.tools.plugins.golden_config",
-    "nornir": "nautobot_mcp_server.tools.plugins.nornir",
+    "design_builder": "nautobot_mcp.tools.plugins.design_builder",
+    "onboarding": "nautobot_mcp.tools.plugins.onboarding",
+    "ssot": "nautobot_mcp.tools.plugins.ssot",
+    "golden_config": "nautobot_mcp.tools.plugins.golden_config",
+    "nornir": "nautobot_mcp.tools.plugins.nornir",
 }
 
 
