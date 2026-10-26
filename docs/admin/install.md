@@ -36,7 +36,7 @@ Run migrations (none are shipped today, but this is harmless) and restart
 Nautobot, then run the MCP server alongside it:
 
 ```bash
-nautobot-mcp-server
+nautobot-mcp
 ```
 
 ## Configuration reference

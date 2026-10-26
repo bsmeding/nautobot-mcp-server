@@ -1,7 +1,7 @@
 # Final release of the old PyPI project name.
 # Build and publish from this directory only. It is not part of the
 # nautobot-mcp distribution. Installing nautobot-mcp-server pulls in
-# nautobot-mcp, which owns the app and the nautobot-mcp-server console script.
+# nautobot-mcp, which owns the app and the nautobot-mcp console script.
 # The only module here is nautobot_mcp_server, which warns on import.
 
 [build-system]

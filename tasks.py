@@ -1,4 +1,4 @@
-"""Invoke tasks for the nautobot-mcp-server development environment.
+"""Invoke tasks for the nautobot-mcp development environment.
 
 Usage examples::
 

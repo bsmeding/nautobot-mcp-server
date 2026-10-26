@@ -52,7 +52,7 @@ class NautobotClient:
             headers={
                 "Authorization": f"Token {settings.token}",
                 "Accept": "application/json",
-                "User-Agent": "nautobot-mcp-server",
+                "User-Agent": "nautobot-mcp",
             },
             verify=settings.verify_ssl,
             timeout=settings.request_timeout,

@@ -15,7 +15,7 @@ in `nautobot_mcp`.
 
 What stays the same:
 
-- The console script is still `nautobot-mcp-server`.
+- The console script is `nautobot-mcp`.
 - In Nautobot, set `PLUGINS = ["nautobot_mcp"]`.
 
 New releases are published only as

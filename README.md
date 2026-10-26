@@ -10,7 +10,7 @@ It can be used in two ways:
 - **As a Nautobot app** — drop it into a Nautobot environment, configure
   `PLUGINS_CONFIG`, and run the MCP server alongside Nautobot.
 - **As a standalone stdio MCP server** — installed in any Python environment
-  with the `nautobot-mcp-server` console script, talking to a remote Nautobot
+  with the `nautobot-mcp` console script, talking to a remote Nautobot
   over its REST API.
 
 This release focuses on **Nautobot's internal/built-in models only** (DCIM,
@@ -22,12 +22,8 @@ tools work against their endpoints if your token has access.
 ## Installation
 
 Published on PyPI as [`nautobot-mcp`](https://pypi.org/project/nautobot-mcp/).
-The Nautobot plugin name is `nautobot_mcp`. The console script remains
-`nautobot-mcp-server`.
-
-The previous PyPI project
-[`nautobot-mcp-server`](https://pypi.org/project/nautobot-mcp-server/)
-is a compatibility shim: installing it installs this package.
+The Nautobot plugin name is `nautobot_mcp`. The console script is
+`nautobot-mcp`.
 
 ```bash
 pip install nautobot-mcp
@@ -97,7 +93,7 @@ PLUGINS_CONFIG = {
 Then run the MCP server alongside Nautobot:
 
 ```bash
-nautobot-mcp-server
+nautobot-mcp
 ```
 
 It reads the same configuration from `PLUGINS_CONFIG` when launched from a
@@ -110,7 +106,7 @@ Set environment variables and run the console script:
 ```bash
 export NAUTOBOT_URL="https://nautobot.example.com"
 export NAUTOBOT_TOKEN="YOUR_API_TOKEN"
-nautobot-mcp-server
+nautobot-mcp
 ```
 
 All configuration knobs:
@@ -136,13 +132,15 @@ still accepted; the prefixed form wins when both are set.
 
 ## Hooking into Claude Desktop
 
-Add to `claude_desktop_config.json`:
+`uvx nautobot-mcp` works because the console script name matches the package
+name. Add to `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "nautobot": {
-      "command": "nautobot-mcp-server",
+      "command": "uvx",
+      "args": ["nautobot-mcp"],
       "env": {
         "NAUTOBOT_URL": "https://nautobot.example.com",
         "NAUTOBOT_TOKEN": "YOUR_API_TOKEN"
@@ -152,11 +150,13 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+If the package is already on `PATH`, `"command": "nautobot-mcp"` is enough.
+
 Other transports are also supported via CLI flag:
 
 ```bash
-nautobot-mcp-server --transport streamable-http
-nautobot-mcp-server --transport sse
+nautobot-mcp --transport streamable-http
+nautobot-mcp --transport sse
 ```
 
 ## Read-only by default

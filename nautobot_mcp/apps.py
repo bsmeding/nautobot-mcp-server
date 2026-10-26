@@ -2,7 +2,7 @@
 
 This module is imported only when running inside a Nautobot environment.
 It is safe to fail to import when Nautobot is not installed; the standalone
-MCP stdio server (``nautobot-mcp-server``) does not need it.
+MCP stdio server (``nautobot-mcp``) does not need it.
 """
 
 from __future__ import annotations

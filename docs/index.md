@@ -8,7 +8,7 @@ It can run two ways:
 
 - **As a Nautobot app** — add `nautobot_mcp` to `PLUGINS` and configure
   it via `PLUGINS_CONFIG`.
-- **As a standalone MCP server** — run the `nautobot-mcp-server` console script
+- **As a standalone MCP server** — run the `nautobot-mcp` console script
   against any reachable Nautobot, configured with environment variables.
 
 ## Highlights

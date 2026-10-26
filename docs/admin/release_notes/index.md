@@ -1,5 +1,10 @@
 # Release Notes
 
+## v0.2.4
+
+- The console script is `nautobot-mcp`, so `uvx nautobot-mcp` starts the server.
+  The `nautobot-mcp-server` script from earlier releases is no longer installed.
+
 ## v0.2.3
 
 - Rename the Python package and Nautobot plugin from `nautobot_mcp_server` to

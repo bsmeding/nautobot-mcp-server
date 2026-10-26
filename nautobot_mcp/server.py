@@ -2,7 +2,7 @@
 
 Run as a stdio MCP server::
 
-    nautobot-mcp-server
+    nautobot-mcp
 
 Or programmatically::
 
@@ -18,6 +18,7 @@ import contextlib
 import logging
 import sys
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from . import __version__
@@ -61,7 +62,7 @@ def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
             logger.info("Nautobot MCP server shut down cleanly")
 
     mcp = MCPServer(
-        "nautobot-mcp-server",
+        "nautobot-mcp",
         instructions=(
             "Tools for interacting with a Nautobot instance via its built-in "
             "REST and GraphQL APIs. Start with `nautobot_status` and "
@@ -99,7 +100,7 @@ async def _async_main(transport: str) -> None:
 def main() -> None:
     """Console-script entrypoint."""
     parser = argparse.ArgumentParser(
-        prog="nautobot-mcp-server",
+        prog=Path(sys.argv[0]).name,
         description="Nautobot MCP server (stdio by default).",
     )
     parser.add_argument(

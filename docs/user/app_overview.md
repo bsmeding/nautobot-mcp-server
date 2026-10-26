@@ -11,7 +11,7 @@ over MCP and let agent behavior live in prompts and tool selection.
 Any MCP client (Claude Desktop, portal, custom agent)
         │  MCP protocol (stdio / streamable-http / sse)
         ▼
-  nautobot-mcp-server
+  nautobot-mcp
         │  REST + GraphQL (token auth)
         ▼
      Nautobot

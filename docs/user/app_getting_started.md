@@ -7,16 +7,18 @@ pip install nautobot-mcp
 
 export NAUTOBOT_URL="https://nautobot.example.com"
 export NAUTOBOT_TOKEN="YOUR_API_TOKEN"
-nautobot-mcp-server
+nautobot-mcp
 ```
 
-Hook it into Claude Desktop via `claude_desktop_config.json`:
+Hook it into Claude Desktop via `claude_desktop_config.json`. `uvx` looks for
+an executable with the same name as the package, which is `nautobot-mcp`:
 
 ```json
 {
   "mcpServers": {
     "nautobot": {
-      "command": "nautobot-mcp-server",
+      "command": "uvx",
+      "args": ["nautobot-mcp"],
       "env": {
         "NAUTOBOT_URL": "https://nautobot.example.com",
         "NAUTOBOT_TOKEN": "YOUR_API_TOKEN"
@@ -29,8 +31,8 @@ Hook it into Claude Desktop via `claude_desktop_config.json`:
 Other transports:
 
 ```bash
-nautobot-mcp-server --transport streamable-http
-nautobot-mcp-server --transport sse
+nautobot-mcp --transport streamable-http
+nautobot-mcp --transport sse
 ```
 
 ## As a Nautobot app
