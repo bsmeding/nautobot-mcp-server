@@ -26,17 +26,17 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 dependencies = [
-  "nautobot-mcp>=0.2.3",
+  "nautobot-mcp>=0.2.5",
 ]
 
 [project.optional-dependencies]
-nautobot = ["nautobot-mcp[nautobot]>=0.2.3"]
-design-builder = ["nautobot-mcp[design-builder]>=0.2.3"]
-onboarding = ["nautobot-mcp[onboarding]>=0.2.3"]
-ssot = ["nautobot-mcp[ssot]>=0.2.3"]
-golden-config = ["nautobot-mcp[golden-config]>=0.2.3"]
-nornir = ["nautobot-mcp[nornir]>=0.2.3"]
-all = ["nautobot-mcp[all]>=0.2.3"]
+nautobot = ["nautobot-mcp[nautobot]>=0.2.5"]
+design-builder = ["nautobot-mcp[design-builder]>=0.2.5"]
+onboarding = ["nautobot-mcp[onboarding]>=0.2.5"]
+ssot = ["nautobot-mcp[ssot]>=0.2.5"]
+golden-config = ["nautobot-mcp[golden-config]>=0.2.5"]
+nornir = ["nautobot-mcp[nornir]>=0.2.5"]
+all = ["nautobot-mcp[all]>=0.2.5"]
 
 [project.urls]
 Homepage = "https://pypi.org/project/nautobot-mcp/"

@@ -1,6 +1,6 @@
 # Release Notes
 
-## v0.2.4
+## v0.2.5
 
 - The console script is `nautobot-mcp`, so `uvx nautobot-mcp` starts the server.
   The `nautobot-mcp-server` script from earlier releases is no longer installed.
@@ -8,6 +8,8 @@
   `NAUTOBOT_MCP_HOST` / `NAUTOBOT_MCP_PORT`. The default stays
   `127.0.0.1:8000`. Use `--host 0.0.0.0` when a reverse proxy connects from
   another host.
+- The PyPI homepage points at the docs on
+  [netdevops.it](https://netdevops.it/projects/nautobot-mcp/user-guide/).
 
 ## v0.2.3
 
