@@ -16,6 +16,7 @@ import argparse
 import asyncio
 import contextlib
 import logging
+import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -33,6 +34,40 @@ if TYPE_CHECKING:
     from mcp.server.mcpserver import MCPServer
 
 logger = logging.getLogger("nautobot_mcp.server")
+
+# Loopback by default so a local stdio-style HTTP listener is not reachable
+# from the network. Override with --host / NAUTOBOT_MCP_HOST for a reverse proxy.
+_DEFAULT_HTTP_HOST = "127.0.0.1"
+_DEFAULT_HTTP_PORT = 8000
+_HTTP_TRANSPORTS = frozenset({"streamable-http", "http", "sse"})
+
+
+def resolve_http_bind(host: str | None, port: int | None) -> tuple[str, int]:
+    """Resolve the HTTP/SSE listen address.
+
+    CLI values win over ``NAUTOBOT_MCP_HOST`` / ``NAUTOBOT_MCP_PORT``.
+    """
+    resolved_host = (host or os.getenv("NAUTOBOT_MCP_HOST") or _DEFAULT_HTTP_HOST).strip()
+    if not resolved_host:
+        resolved_host = _DEFAULT_HTTP_HOST
+
+    if port is not None:
+        resolved_port = port
+    else:
+        raw_port = os.getenv("NAUTOBOT_MCP_PORT")
+        if raw_port is None or raw_port.strip() == "":
+            resolved_port = _DEFAULT_HTTP_PORT
+        else:
+            try:
+                resolved_port = int(raw_port)
+            except ValueError as exc:
+                raise ValueError(
+                    f"NAUTOBOT_MCP_PORT must be an integer, got {raw_port!r}."
+                ) from exc
+
+    if not 0 <= resolved_port <= 65535:
+        raise ValueError(f"HTTP port must be between 0 and 65535, got {resolved_port}.")
+    return resolved_host, resolved_port
 
 
 def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
@@ -79,7 +114,12 @@ def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
     return mcp
 
 
-async def _async_main(transport: str) -> None:
+async def _async_main(
+    transport: str,
+    *,
+    host: str | None = None,
+    port: int | None = None,
+) -> None:
     try:
         mcp = build_server()
     except ValueError as exc:
@@ -89,10 +129,16 @@ async def _async_main(transport: str) -> None:
 
     if transport == "stdio":
         await mcp.run_stdio_async()
-    elif transport in {"streamable-http", "http"}:
-        await mcp.run_streamable_http_async()
+        return
+
+    bind_host = host if host is not None else _DEFAULT_HTTP_HOST
+    bind_port = port if port is not None else _DEFAULT_HTTP_PORT
+    if transport in {"streamable-http", "http"}:
+        logger.info("Streamable HTTP MCP endpoint at http://%s:%s/mcp", bind_host, bind_port)
+        await mcp.run_streamable_http_async(host=bind_host, port=bind_port)
     elif transport == "sse":
-        await mcp.run_sse_async()
+        logger.info("SSE MCP endpoint at http://%s:%s/sse", bind_host, bind_port)
+        await mcp.run_sse_async(host=bind_host, port=bind_port)
     else:
         raise ValueError(f"Unsupported transport: {transport}")
 
@@ -110,6 +156,24 @@ def main() -> None:
         help="MCP transport to use (default: stdio).",
     )
     parser.add_argument(
+        "--host",
+        default=None,
+        help=(
+            "Bind address for streamable-http and sse "
+            f"(default: {_DEFAULT_HTTP_HOST}, or NAUTOBOT_MCP_HOST). "
+            "Use 0.0.0.0 when a reverse proxy on another host connects in."
+        ),
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help=(
+            "Bind port for streamable-http and sse "
+            f"(default: {_DEFAULT_HTTP_PORT}, or NAUTOBOT_MCP_PORT)."
+        ),
+    )
+    parser.add_argument(
         "--log-level",
         default=None,
         help="Override log level (DEBUG, INFO, WARNING, ERROR).",
@@ -120,8 +184,17 @@ def main() -> None:
         # Set early so any startup errors are logged at the requested level.
         configure_logging(args.log_level)
 
+    host: str | None = None
+    port: int | None = None
+    if args.transport in _HTTP_TRANSPORTS:
+        try:
+            host, port = resolve_http_bind(args.host, args.port)
+        except ValueError as exc:
+            print(f"Error: {exc}", file=sys.stderr, flush=True)
+            sys.exit(2)
+
     with contextlib.suppress(KeyboardInterrupt):
-        asyncio.run(_async_main(args.transport))
+        asyncio.run(_async_main(args.transport, host=host, port=port))
 
 
 if __name__ == "__main__":

@@ -124,6 +124,8 @@ All configuration knobs:
 | `NAUTOBOT_MCP_TENANT_GROUP_SCOPE` | — | Comma-separated tenant group names to restrict access to. |
 | `NAUTOBOT_MCP_PLUGINS` | `auto` | Plugin integrations to enable. |
 | `NAUTOBOT_MCP_LOG_LEVEL` | `INFO` | Log level (logs go to stderr). |
+| `NAUTOBOT_MCP_HOST` | `127.0.0.1` | Bind address for `streamable-http` and `sse`. |
+| `NAUTOBOT_MCP_PORT` | `8000` | Bind port for `streamable-http` and `sse`. |
 
 Connection credentials stay as `NAUTOBOT_URL` / `NAUTOBOT_TOKEN`. MCP-specific
 knobs use the `NAUTOBOT_MCP_` prefix. Legacy unprefixed names
@@ -152,12 +154,19 @@ name. Add to `claude_desktop_config.json`:
 
 If the package is already on `PATH`, `"command": "nautobot-mcp"` is enough.
 
-Other transports are also supported via CLI flag:
+Other transports are also supported via CLI flag. They listen on
+`127.0.0.1:8000` unless you set `--host` / `--port` (or `NAUTOBOT_MCP_HOST` /
+`NAUTOBOT_MCP_PORT`). Use a non-loopback address when a reverse proxy on
+another host connects to this process. The Nautobot app does not serve MCP
+itself; point the client at this process, or at the proxy in front of it.
 
 ```bash
 nautobot-mcp --transport streamable-http
+nautobot-mcp --transport streamable-http --host 0.0.0.0 --port 8000
 nautobot-mcp --transport sse
 ```
+
+Streamable HTTP is served at `/mcp`. SSE is served at `/sse`.
 
 ## Read-only by default
 

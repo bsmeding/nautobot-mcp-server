@@ -90,7 +90,8 @@ docs = [
 nautobot-mcp = "nautobot_mcp.server:main"
 
 [project.urls]
-Homepage = "https://github.com/bsmeding/nautobot-mcp-server"
+Homepage = "https://netdevops.it/projects/nautobot-mcp/user-guide/"
+Documentation = "https://netdevops.it/projects/nautobot-mcp/user-guide/"
 Repository = "https://github.com/bsmeding/nautobot-mcp-server"
 Issues = "https://github.com/bsmeding/nautobot-mcp-server/issues"
 Changelog = "https://github.com/bsmeding/nautobot-mcp-server/releases"

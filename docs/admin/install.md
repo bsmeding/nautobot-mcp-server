@@ -54,6 +54,8 @@ nautobot-mcp
 | `NAUTOBOT_MCP_TENANT_GROUP_SCOPE` | `tenant_group_scope` | — | Restrict to tenant groups. |
 | `NAUTOBOT_MCP_PLUGINS` | `plugins` | `auto` | Plugin integrations to enable. |
 | `NAUTOBOT_MCP_LOG_LEVEL` | `log_level` | `INFO` | Log level. |
+| `NAUTOBOT_MCP_HOST` | — | `127.0.0.1` | Bind address for HTTP/SSE transports. CLI `--host` wins. |
+| `NAUTOBOT_MCP_PORT` | — | `8000` | Bind port for HTTP/SSE transports. CLI `--port` wins. |
 
 Legacy unprefixed names (`NAUTOBOT_ALLOW_WRITES`, `NAUTOBOT_TENANT_SCOPE`,
 `MCP_LOG_LEVEL`, …) are still accepted; the `NAUTOBOT_MCP_*` form wins when

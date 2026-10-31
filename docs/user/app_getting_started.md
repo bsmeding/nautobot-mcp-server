@@ -28,12 +28,18 @@ an executable with the same name as the package, which is `nautobot-mcp`:
 }
 ```
 
-Other transports:
+Other transports listen on `127.0.0.1:8000` by default. Set `--host` and
+`--port` (or `NAUTOBOT_MCP_HOST` / `NAUTOBOT_MCP_PORT`) when a reverse proxy
+on another machine needs to reach the process. Point the MCP client at that
+process or proxy. The Nautobot app does not expose an MCP HTTP endpoint.
 
 ```bash
 nautobot-mcp --transport streamable-http
+nautobot-mcp --transport streamable-http --host 0.0.0.0 --port 8000
 nautobot-mcp --transport sse
 ```
+
+Streamable HTTP is at `/mcp`. SSE is at `/sse`.
 
 ## As a Nautobot app
 

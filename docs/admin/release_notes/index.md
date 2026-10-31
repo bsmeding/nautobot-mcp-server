@@ -4,6 +4,10 @@
 
 - The console script is `nautobot-mcp`, so `uvx nautobot-mcp` starts the server.
   The `nautobot-mcp-server` script from earlier releases is no longer installed.
+- `streamable-http` and `sse` accept `--host` / `--port`, or
+  `NAUTOBOT_MCP_HOST` / `NAUTOBOT_MCP_PORT`. The default stays
+  `127.0.0.1:8000`. Use `--host 0.0.0.0` when a reverse proxy connects from
+  another host.
 
 ## v0.2.3
 
