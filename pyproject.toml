@@ -12,6 +12,7 @@ license = { text = "MIT" }
 authors = [
   { name = "bsmeding", email = "b@rtsmeding.nl" },
 ]
+
 keywords = [
   "nautobot",
   "nautobot-app",
@@ -21,6 +22,7 @@ keywords = [
   "llm",
   "ai",
 ]
+
 classifiers = [
   "Development Status :: 4 - Beta",
   "Framework :: Django",
