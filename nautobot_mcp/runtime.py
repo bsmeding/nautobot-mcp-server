@@ -1,8 +1,6 @@
-"""Process-wide runtime state for the MCP server.
+"""Shared client and settings for the running MCP process.
 
-The MCP tool functions need access to a shared :class:`NautobotClient`
-instance. We hold it here so tool modules can grab it lazily without
-creating import cycles with the server module.
+Tool modules read it from here so they don't import the server module.
 """
 
 from __future__ import annotations
@@ -20,13 +18,13 @@ _enabled_plugins: tuple[str, ...] = ()
 
 
 def set_client(client: NautobotClient) -> None:
-    """Register the active NautobotClient (called from server lifespan)."""
+    """Store the client. Called when the server starts."""
     global _client
     _client = client
 
 
 def get_client() -> NautobotClient:
-    """Return the active client or raise if not initialized."""
+    """Active client. Raises when the server has not started."""
     if _client is None:
         raise RuntimeError(
             "NautobotClient is not initialized. The MCP server must be "
@@ -36,31 +34,31 @@ def get_client() -> NautobotClient:
 
 
 def set_settings(settings: NautobotMcpSettings) -> None:
-    """Register the active settings."""
+    """Store the resolved settings."""
     global _settings
     _settings = settings
 
 
 def get_settings() -> NautobotMcpSettings:
-    """Return the active settings or raise if not initialized."""
+    """Resolved settings. Raises when they were not loaded."""
     if _settings is None:
         raise RuntimeError("Settings not initialized.")
     return _settings
 
 
 def set_enabled_plugins(keys: tuple[str, ...]) -> None:
-    """Record which plugin integrations were enabled at registration."""
+    """Remember which plugin tools were registered."""
     global _enabled_plugins
     _enabled_plugins = keys
 
 
 def get_enabled_plugins() -> tuple[str, ...]:
-    """Return the plugin integrations enabled for this server."""
+    """Plugin keys registered on this process."""
     return _enabled_plugins
 
 
 def reset() -> None:
-    """Clear runtime state (useful for tests)."""
+    """Clear client, settings, and plugin list. Used by tests."""
     global _client, _settings, _enabled_plugins
     _client = None
     _settings = None

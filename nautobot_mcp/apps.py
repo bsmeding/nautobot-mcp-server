@@ -1,8 +1,6 @@
-"""Nautobot/Django app configuration for nautobot-mcp.
+"""Nautobot app config. Imported only inside Nautobot.
 
-This module is imported only when running inside a Nautobot environment.
-It is safe to fail to import when Nautobot is not installed; the standalone
-MCP stdio server (``nautobot-mcp``) does not need it.
+The standalone nautobot-mcp process does not need this module.
 """
 
 from __future__ import annotations
@@ -13,11 +11,11 @@ from . import __version__
 
 
 class NautobotMcpServerConfig(NautobotAppConfig):
-    """Nautobot app configuration for the MCP Server."""
+    """Nautobot app entry for the MCP status page."""
 
-    # Nautobot loads urls, navigation, and jobs from ``<AppConfig.__module__>``.
-    # This class lives in ``apps.py`` so a standalone MCP process can skip it,
-    # but Nautobot must still look at the ``nautobot_mcp`` package.
+    # Nautobot loads urls/navigation/jobs from this class's module.
+    # Keep __module__ on the package so those files are found, while this
+    # class stays in apps.py and a standalone process can skip the import.
     __module__ = "nautobot_mcp"
 
     name = "nautobot_mcp"
@@ -52,10 +50,8 @@ class NautobotMcpServerConfig(NautobotAppConfig):
         # Accepts a list of tenant names/slugs and/or tenant group names.
         "tenant_scope": [],
         "tenant_group_scope": [],
-        # Plugin (Nautobot app) integrations to expose as MCP tools.
-        # "auto" = enable a plugin's tools when /api/status/ lists that app,
-        # or when its Python package is importable here. Explicit keys
-        # (design_builder, onboarding, ssot) or "all" force-enable.
+        # auto = tools for apps listed on /api/status/, or installed here.
+        # Explicit keys (design_builder, onboarding, ssot) or "all" force them on.
         "plugins": ["auto"],
     }
     caching_config: dict = {}

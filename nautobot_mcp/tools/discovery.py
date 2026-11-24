@@ -1,7 +1,4 @@
-"""Discovery / metadata tools.
-
-Useful for an LLM to figure out *what* endpoints exist before calling them.
-"""
+"""Status, API roots, and which plugin tools are on."""
 
 from __future__ import annotations
 

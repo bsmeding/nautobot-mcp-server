@@ -1,10 +1,4 @@
-"""Tools for the Nautobot Device Onboarding app
-(``nautobot-device-onboarding``).
-
-Device Onboarding discovers a device over the network (SSH/NAPALM or the
-newer SSoT-based sync) and creates/updates it in Nautobot. It is driven by
-Jobs, so these tools are job-centric.
-"""
+"""Device Onboarding — discover a device and create it via a Job."""
 
 from __future__ import annotations
 

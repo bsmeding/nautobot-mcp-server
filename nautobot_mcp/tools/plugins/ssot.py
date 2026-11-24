@@ -1,10 +1,4 @@
-"""Tools for the Nautobot SSoT app (``nautobot-ssot``).
-
-SSoT (Single Source of Truth) synchronizes data between Nautobot and
-external systems via DiffSync-based Jobs. Each run is recorded as a "Sync"
-with associated log entries. These tools list/inspect sync history and run
-SSoT data source/target jobs.
-"""
+"""SSoT — list syncs and run a data source or target Job."""
 
 from __future__ import annotations
 

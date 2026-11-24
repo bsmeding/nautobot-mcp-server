@@ -1,8 +1,6 @@
-"""Nautobot Jobs for the MCP Server app.
+"""No Jobs of our own. Nautobot still imports this module.
 
-This app ships no Jobs of its own -- it exposes Nautobot's existing APIs and
-Jobs over MCP. This module follows the standard Nautobot app layout and is
-the place to register any future Jobs. Imported only inside Nautobot.
+Add a Job class here later and put it in `jobs` if we need one.
 """
 
 from __future__ import annotations

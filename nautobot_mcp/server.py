@@ -1,13 +1,6 @@
-"""MCP server entrypoint for Nautobot.
+"""Start nautobot-mcp.
 
-Run as a stdio MCP server::
-
-    nautobot-mcp
-
-Or programmatically::
-
-    from nautobot_mcp.server import build_server, main
-    main()
+stdio is the default (`nautobot-mcp`). HTTP/SSE need --host and --port.
 """
 
 from __future__ import annotations
@@ -36,18 +29,15 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("nautobot_mcp.server")
 
-# Loopback by default so a local stdio-style HTTP listener is not reachable
-# from the network. Override with --host / NAUTOBOT_MCP_HOST for a reverse proxy.
+# Loopback unless --host / NAUTOBOT_MCP_HOST says otherwise.
+# Use 0.0.0.0 when a proxy on another host connects in.
 _DEFAULT_HTTP_HOST = "127.0.0.1"
 _DEFAULT_HTTP_PORT = 8000
 _HTTP_TRANSPORTS = frozenset({"streamable-http", "http", "sse"})
 
 
 def resolve_http_bind(host: str | None, port: int | None) -> tuple[str, int]:
-    """Resolve the HTTP/SSE listen address.
-
-    CLI values win over ``NAUTOBOT_MCP_HOST`` / ``NAUTOBOT_MCP_PORT``.
-    """
+    """HTTP/SSE bind address. CLI wins over NAUTOBOT_MCP_HOST / NAUTOBOT_MCP_PORT."""
     resolved_host = (host or os.getenv("NAUTOBOT_MCP_HOST") or _DEFAULT_HTTP_HOST).strip()
     if not resolved_host:
         resolved_host = _DEFAULT_HTTP_HOST
@@ -72,12 +62,7 @@ def resolve_http_bind(host: str | None, port: int | None) -> tuple[str, int]:
 
 
 def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
-    """Construct a configured MCP server.
-
-    The actual NautobotClient is created in the ``lifespan`` so the
-    HTTP connection is opened only when the server starts (this matters
-    for cleanly closing the client on shutdown).
-    """
+    """Build the MCP server. The HTTP client opens in lifespan, so shutdown can close it."""
     from mcp.server.mcpserver import MCPServer  # local import keeps import cost low
 
     from .tools import register_all
@@ -146,7 +131,7 @@ async def _async_main(
 
 
 def main() -> None:
-    """Console-script entrypoint."""
+    """Console script entrypoint."""
     parser = argparse.ArgumentParser(
         prog=Path(sys.argv[0]).name,
         description="Nautobot MCP server (stdio by default).",

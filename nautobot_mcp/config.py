@@ -1,16 +1,8 @@
-"""Configuration loading for the Nautobot MCP server.
+"""Settings for nautobot-mcp.
 
-Resolution order (highest priority first):
-
-1. Explicit kwargs passed to :func:`load_settings`.
-2. Environment variables (``NAUTOBOT_URL``, ``NAUTOBOT_TOKEN``, and the
-   ``NAUTOBOT_MCP_*`` settings below). Unprefixed legacy aliases
-   (``NAUTOBOT_ALLOW_WRITES``, ``NAUTOBOT_TENANT_SCOPE``, …) are still
-   accepted but the ``NAUTOBOT_MCP_*`` form wins when both are set.
-   ``NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN`` makes the server token optional:
-   each HTTP client must send its own token in ``X-Nautobot-Token``.
-3. ``settings.PLUGINS_CONFIG["nautobot_mcp"]`` when running inside
-   Nautobot/Django.
+Order: kwargs, then env, then PLUGINS_CONFIG["nautobot_mcp"] inside Nautobot.
+NAUTOBOT_URL and NAUTOBOT_TOKEN stay unprefixed. Other knobs use NAUTOBOT_MCP_*.
+Old unprefixed names still work; the NAUTOBOT_MCP_ name wins when both are set.
 """
 
 from __future__ import annotations
@@ -35,7 +27,7 @@ _ENV_ALIASES: dict[str, tuple[str, ...]] = {
 
 
 def _getenv(name: str) -> str | None:
-    """Read ``name``, falling back to any registered legacy aliases."""
+    """Env value. Falls back to the old unprefixed name when set."""
     value = os.getenv(name)
     if value not in (None, ""):
         return value
@@ -47,11 +39,7 @@ def _getenv(name: str) -> str | None:
 
 
 def _coerce_str_tuple(value: Any) -> tuple[str, ...]:
-    """Coerce a value into a tuple of non-empty strings.
-
-    Accepts a list/tuple, or a comma-separated string (handy for env vars
-    like ``NAUTOBOT_MCP_TENANT_SCOPE=acme,globex``).
-    """
+    """List, tuple, or comma-separated string -> tuple of non-empty strings."""
     if value is None:
         return ()
     if isinstance(value, (list, tuple)):
@@ -73,7 +61,7 @@ def _coerce_bool(value: Any, default: bool) -> bool:
 
 
 def _from_django_settings() -> dict[str, Any]:
-    """Pull plugin config from Nautobot's PLUGINS_CONFIG, if available."""
+    """PLUGINS_CONFIG['nautobot_mcp'] when Django is loaded, else {}."""
     try:
         from django.conf import settings  # type: ignore[import-not-found]
     except ImportError:
@@ -88,7 +76,7 @@ def _from_django_settings() -> dict[str, Any]:
 
 @dataclass(frozen=True)
 class NautobotMcpSettings:
-    """Resolved runtime settings for the MCP server."""
+    """Settings after kwargs, env, and the Nautobot plugin config are merged."""
 
     url: str
     token: str
@@ -105,11 +93,11 @@ class NautobotMcpSettings:
 
     @property
     def tenant_scoped(self) -> bool:
-        """True when any tenant or tenant-group restriction is configured."""
+        """True when a tenant or tenant-group limit is set."""
         return bool(self.tenant_scope or self.tenant_group_scope)
 
     def redacted(self) -> dict[str, Any]:
-        """Return a dict suitable for logging (token masked)."""
+        """Same settings, with the token masked, for logs."""
         if len(self.token) >= 8:
             token_preview = f"{self.token[:4]}…{self.token[-4:]}"
         elif self.token:
@@ -135,7 +123,7 @@ class NautobotMcpSettings:
 
 
 def load_settings(**overrides: Any) -> NautobotMcpSettings:
-    """Resolve settings from kwargs > env > Django PLUGINS_CONFIG."""
+    """kwargs, then env, then the Nautobot plugin config."""
     django_cfg = _from_django_settings()
 
     def _pick(key: str, env: str, *, default: Any = None) -> Any:
@@ -234,16 +222,12 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
 
 
 def plugin_config_snapshot() -> dict[str, Any]:
-    """Return ``PLUGINS_CONFIG['nautobot_mcp']`` without validating it.
-
-    The status page uses this when the MCP process is not fully configured
-    yet, so the app can still show which settings are present.
-    """
+    """Raw plugin config for the status page, even when URL or token is missing."""
     return _from_django_settings()
 
 
 def _django_key(key: str) -> str:
-    """Map an internal setting name to the Django PLUGINS_CONFIG key."""
+    """Internal name -> key in PLUGINS_CONFIG (url -> nautobot_url)."""
     return {
         "url": "nautobot_url",
         "token": "nautobot_token",

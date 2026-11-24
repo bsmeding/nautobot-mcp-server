@@ -1,24 +1,12 @@
-"""Optional Nautobot app (plugin) tool integrations.
+"""Optional Nautobot app tools (Design Builder, Onboarding, SSoT, ...).
 
-Each module in this package wraps a NetworkToCode / Nautobot app
-(design-builder, onboarding, ssot, ...) as MCP tools. Plugins are
-*optional*: the core install only exposes Nautobot-core tools.
+Core tools are always on. These are extra.
 
-A plugin's tools are registered when it is **enabled**, which is decided
-by :func:`is_plugin_enabled` from the ``plugins`` setting:
+auto (default): enable a tool when GET /api/status/ lists the app under
+nautobot-apps, or when that Python package is installed in this process.
+An explicit key (design_builder, onboarding, ssot, ...) or "all" forces it on.
 
-* ``"auto"`` (default) -- enable the plugin when Nautobot's ``/api/status/``
-  lists it under ``nautobot-apps`` (or the older ``plugins`` key), or when
-  its Python package is importable in this process.
-* an explicit key (``"design_builder"``, ``"onboarding"``, ``"ssot"``) --
-  force-enable that plugin.
-* ``"all"`` -- force-enable every known plugin.
-
-Each plugin module exposes:
-
-    KEY: str                      # canonical plugin key
-    DIST_PACKAGES: tuple[str,...] # Nautobot app / package name(s)
-    def register(mcp) -> None     # attach the plugin's tools
+Each module exposes KEY, DIST_PACKAGES, and register(mcp).
 """
 
 from __future__ import annotations
@@ -61,11 +49,9 @@ def _package_importable(packages: tuple[str, ...]) -> bool:
 
 
 def installed_app_names(status: dict[str, Any]) -> set[str]:
-    """Return enabled Nautobot app names from an ``/api/status/`` document.
+    """App names from /api/status/.
 
-    Prefer ``nautobot-apps`` (the apps listed in ``PLUGINS``). Fall back to
-    the legacy ``plugins`` key, then to ``installed-apps`` when neither is
-    present.
+    nautobot-apps is the PLUGINS list. Fall back to plugins, then installed-apps.
     """
     for key in ("nautobot-apps", "plugins"):
         block = status.get(key)
@@ -83,10 +69,10 @@ def installed_app_names(status: dict[str, Any]) -> set[str]:
 
 
 def fetch_installed_app_names(settings: NautobotMcpSettings) -> set[str]:
-    """GET ``/api/status/`` and return the enabled app names.
+    """Enabled app names from GET /api/status/.
 
-    Returns an empty set when this process has no token or the call fails.
-    Startup then falls back to local package detection.
+    Empty set when this process has no token or the call fails.
+    Startup then falls back to local packages.
     """
     if not settings.token:
         logger.info(
@@ -133,10 +119,9 @@ def is_plugin_enabled(
     dist_packages: tuple[str, ...],
     remote_apps: set[str] | None = None,
 ) -> bool:
-    """Decide whether ``key`` should be enabled given the configuration.
+    """True when this plugin's tools should be registered.
 
-    ``remote_apps`` is the set of app names from ``/api/status/``. ``None``
-    means that document was not consulted.
+    remote_apps comes from /api/status/. None means that call was skipped.
     """
     selectors = {_normalize_name(s) for s in plugins_setting}
     if "all" in selectors:

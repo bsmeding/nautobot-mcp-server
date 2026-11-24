@@ -1,14 +1,7 @@
-"""Nautobot MCP Server.
+"""Nautobot MCP server — REST and GraphQL as tools for an LLM.
 
-A Model Context Protocol (MCP) server that exposes Nautobot's built-in
-REST and GraphQL APIs as tools for LLMs and AI assistants.
-
-Can be used in two ways:
-
-1. As a Nautobot app (installed in a Nautobot environment): set
-   ``PLUGINS = ["nautobot_mcp"]`` and configure ``PLUGINS_CONFIG``.
-2. As a standalone MCP stdio server via the ``nautobot-mcp`` console
-   script, configured with ``NAUTOBOT_URL`` / ``NAUTOBOT_TOKEN`` env vars.
+Nautobot app: PLUGINS = ["nautobot_mcp"].
+Standalone: nautobot-mcp with NAUTOBOT_URL and NAUTOBOT_TOKEN.
 """
 
 from importlib import metadata
@@ -17,7 +10,7 @@ __all__ = ["__version__", "config"]
 
 
 def _resolve_version() -> str:
-    """Resolve the installed package version, with fallbacks."""
+    """Installed package version, or 0.0.0 when none of the names match."""
     for dist_name in ("nautobot-mcp", "nautobot-mcp-server", "nautobot-app-mcp-server", __name__):
         try:
             return metadata.version(dist_name)
@@ -29,9 +22,8 @@ def _resolve_version() -> str:
 __version__ = _resolve_version()
 
 
-# Expose ``config`` only when Nautobot is available (i.e. when imported
-# inside a Nautobot/Django environment). This lets the standalone MCP
-# stdio server run in environments where Nautobot is not installed.
+# config is the Nautobot app class. Skip it when Nautobot is not installed
+# so `nautobot-mcp` still starts on a machine that only has this package.
 try:
     from .apps import NautobotMcpServerConfig
 

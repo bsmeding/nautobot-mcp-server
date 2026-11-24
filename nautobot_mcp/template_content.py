@@ -1,9 +1,4 @@
-"""Template extensions for the Nautobot MCP Server app.
-
-No object-detail extensions are shipped today; this module exists to follow
-the standard Nautobot app layout and provide an obvious place to add
-``TemplateExtension`` subclasses later. Imported only inside Nautobot.
-"""
+"""No detail-view panels yet. Nautobot still imports this module."""
 
 from __future__ import annotations
 

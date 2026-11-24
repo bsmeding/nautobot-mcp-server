@@ -1,13 +1,6 @@
-"""Tools for the Nautobot Nornir app (``nautobot-plugin-nornir``).
+"""Nornir — backend used by Golden Config and Onboarding.
 
-This app is primarily a *backend* library: it provides the Nornir
-inventory, credential providers, and task dispatchers used by other apps
-(notably Golden Config and Device Onboarding) to talk to devices. It does
-not expose its own task-execution REST API, so there is little to drive
-directly -- network actions run through the consuming app's Jobs.
-
-These tools surface its configuration so an agent can confirm the backend
-is present and how it is wired up.
+No task API of its own. This only reports whether it is installed.
 """
 
 from __future__ import annotations

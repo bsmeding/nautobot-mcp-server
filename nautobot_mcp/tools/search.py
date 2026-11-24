@@ -1,10 +1,4 @@
-"""Cross-domain search convenience tools.
-
-These wrap common ``rest_list`` filter combinations so an LLM doesn't
-have to remember Nautobot's exact filter names for everyday questions
-("find all active core devices in Amsterdam"). For anything outside
-these patterns, fall back to ``rest_list``.
-"""
+"""Shortcuts for common searches. Anything else uses rest_list."""
 
 from __future__ import annotations
 

@@ -1,7 +1,4 @@
-"""Logging setup for the Nautobot MCP server.
-
-Logs always go to stderr so the stdio MCP transport (stdout) stays clean.
-"""
+"""Logs go to stderr so stdio MCP (stdout) stays clean."""
 
 from __future__ import annotations
 
@@ -12,11 +9,7 @@ LOGGER_NAME = "nautobot_mcp"
 
 
 def configure_logging(level: str = "INFO", log_file: str = "") -> logging.Logger:
-    """Configure (or reconfigure) the package logger and return it.
-
-    Stderr is always attached so the stdio MCP transport stays clean.
-    ``log_file`` is optional and is what the Nautobot status page reads.
-    """
+    """Attach stderr, and log_file when set. The status page tails that file."""
     logger = logging.getLogger(LOGGER_NAME)
     for handler in list(logger.handlers):
         logger.removeHandler(handler)
@@ -38,10 +31,9 @@ def configure_logging(level: str = "INFO", log_file: str = "") -> logging.Logger
 
 
 def read_log_tail(path: str, *, max_lines: int = 200, max_bytes: int = 65_536) -> str | None:
-    """Return the end of a log file.
+    """Tail of the log file.
 
-    ``None`` when ``path`` is empty (logging to a file is not configured).
-    An empty string when the path is set but the file is not there yet.
+    None when no path is configured. "" when the file is not there yet.
     """
     from pathlib import Path
 

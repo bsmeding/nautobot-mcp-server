@@ -1,10 +1,4 @@
-"""Tools for the Nautobot Design Builder app (``nautobot-design-builder``).
-
-Design Builder lets you define declarative "designs" and deploy them as
-Nautobot Jobs, tracking each deployment so it can be updated or rolled
-back. These tools expose its REST models when present and provide
-job-centric helpers for running designs.
-"""
+"""Design Builder — list designs and run them as Jobs."""
 
 from __future__ import annotations
 

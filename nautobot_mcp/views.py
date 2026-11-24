@@ -1,11 +1,7 @@
-"""UI views for the Nautobot MCP Server app.
+"""Status page for the Nautobot app. No models.
 
-This app has no database models -- it exposes Nautobot's APIs over MCP. The
-single view is an operational status page showing the resolved (redacted)
-configuration and the enabled plugin integrations, so operators can confirm
-how the server is wired up from within Nautobot.
-
-This module is imported only inside a Nautobot/Django environment.
+Shows the resolved settings (token redacted) and which plugin tools are on.
+Imported only inside Nautobot.
 """
 
 from __future__ import annotations
@@ -19,7 +15,7 @@ from . import __version__
 
 
 class MCPServerHomeView(LoginRequiredMixin, TemplateView):
-    """Operational status page for the MCP server."""
+    """MCP status page. Login required."""
 
     template_name = "nautobot_mcp/home.html"
 

@@ -1,8 +1,4 @@
-"""Navigation menu for the Nautobot MCP Server app.
-
-Adds a single menu item pointing at the status page. Imported only inside a
-Nautobot/Django environment.
-"""
+"""Apps menu item for the MCP status page. Nautobot only."""
 
 from __future__ import annotations
 

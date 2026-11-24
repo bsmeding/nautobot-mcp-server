@@ -1,14 +1,8 @@
-"""Per-client Nautobot API token for one MCP request.
+"""Caller's Nautobot token for one MCP request.
 
-A shared server token makes every caller look like the same Nautobot user.
-HTTP transports (streamable HTTP and SSE) carry the caller's token on the
-request. The middleware below stores it in a context variable for the
-duration of that message, and :class:`nautobot_mcp.client.NautobotClient`
-sends it as ``Authorization: Token …``. Nautobot then attributes the API
-call — including the change log — to that token's user.
-
-Stdio has no request headers. There the process ``NAUTOBOT_TOKEN`` is the
-caller's token, which is already one identity per local MCP client.
+A shared server token makes every caller the same Nautobot user.
+HTTP clients send X-Nautobot-Token (or Authorization: Token).
+Stdio has no headers — NAUTOBOT_TOKEN is that person's token.
 """
 
 from __future__ import annotations
@@ -28,11 +22,10 @@ _TOKEN_HEADER = "x-nautobot-token"
 
 
 def token_from_headers(headers: Mapping[str, str] | None) -> str | None:
-    """Return the caller's Nautobot token from MCP HTTP headers.
+    """Token from the MCP HTTP headers.
 
-    ``X-Nautobot-Token`` wins. ``Authorization: Token <key>`` is also
-    accepted. ``Authorization: Bearer`` is left alone so an OAuth token
-    used to reach the MCP endpoint is not forwarded to Nautobot.
+    X-Nautobot-Token wins. Authorization: Token is accepted.
+    Authorization: Bearer is ignored — that is for the MCP endpoint, not Nautobot.
     """
     if not headers:
         return None
@@ -57,17 +50,17 @@ def token_from_headers(headers: Mapping[str, str] | None) -> str | None:
 
 
 def current_client_token() -> str | None:
-    """Token bound for the current MCP message, if the caller sent one."""
+    """Token for this MCP message, or None."""
     return _CLIENT_TOKEN.get()
 
 
 def http_request_active() -> bool:
-    """True while handling an HTTP MCP message (headers were present)."""
+    """True while an HTTP MCP message is running."""
     return _HTTP_REQUEST.get()
 
 
 def bind_http_headers(headers: Mapping[str, str]) -> tuple[Token[str | None], Token[bool]]:
-    """Bind the token from ``headers`` for the current task."""
+    """Store the header token on this task. Returns the reset tokens."""
     return (
         _CLIENT_TOKEN.set(token_from_headers(headers)),
         _HTTP_REQUEST.set(True),
@@ -75,13 +68,13 @@ def bind_http_headers(headers: Mapping[str, str]) -> tuple[Token[str | None], To
 
 
 def reset_http_headers(tokens: tuple[Token[str | None], Token[bool]]) -> None:
-    """Restore the context vars saved by :func:`bind_http_headers`."""
+    """Put the context vars back. tokens come from bind_http_headers."""
     _CLIENT_TOKEN.reset(tokens[0])
     _HTTP_REQUEST.reset(tokens[1])
 
 
 class ClientTokenMiddleware:
-    """Copy the caller's Nautobot token onto the task that runs the tool."""
+    """Copy the caller's token onto the task that runs the tool."""
 
     async def __call__(self, ctx: Any, call_next: Any) -> Any:
         request = getattr(ctx, "request", None)

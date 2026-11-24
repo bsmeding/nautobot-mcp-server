@@ -1,9 +1,4 @@
-"""Generic REST passthrough tools.
-
-These tools let an LLM hit any Nautobot REST endpoint without us having
-to hand-wrap every model. They are the backbone of "internal Nautobot
-access".
-"""
+"""REST passthrough for endpoints that don't have their own tool."""
 
 from __future__ import annotations
 

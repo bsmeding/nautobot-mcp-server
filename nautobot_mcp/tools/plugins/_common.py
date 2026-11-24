@@ -1,10 +1,4 @@
-"""Shared helpers for plugin tool modules.
-
-Most NetworkToCode apps drive their behavior through Nautobot **Jobs**
-rather than bespoke REST models, so these helpers make it easy to list
-and run an app's jobs, and to hit its ``/api/plugins/<app>/`` namespace
-generically.
-"""
+"""Helpers for the app tools. Most of those apps run as Nautobot Jobs."""
 
 from __future__ import annotations
 
@@ -14,7 +8,7 @@ from .._helpers import client
 
 
 async def list_jobs_matching(q: str | None = None) -> Any:
-    """List installed jobs, optionally free-text filtered (Nautobot ``q``)."""
+    """Installed jobs. q is Nautobot's free-text filter."""
     filters: dict[str, Any] = {}
     if q:
         filters["q"] = q
@@ -30,10 +24,9 @@ async def run_job_by_name_or_id(
     commit: bool = True,
     schedule: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Trigger a Nautobot job by UUID or name and return the job result.
+    """Run a job by UUID or name.
 
-    Job runs are POSTs gated by Nautobot's own per-job permissions, so this
-    deliberately bypasses the MCP write-gate (mirroring ``extras.run_job``).
+    This POST skips the MCP write lock. Nautobot still checks the job permission.
     """
     from .._helpers import lookup_id_or_name
 

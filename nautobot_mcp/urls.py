@@ -1,8 +1,4 @@
-"""URL patterns for the Nautobot MCP Server app.
-
-Mounted by Nautobot under the app's ``base_url`` (``/plugins/mcp-server/``).
-Imported only inside a Nautobot/Django environment.
-"""
+"""Routes under /plugins/mcp-server/. Nautobot only."""
 
 from __future__ import annotations
 

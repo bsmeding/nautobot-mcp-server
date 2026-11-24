@@ -50,13 +50,11 @@ pip install "nautobot-mcp[all]"               # all of the above
 ```
 
 By default (`plugins = ["auto"]`) the server calls `GET /api/status/` and
-enables a plugin's tools when that app is listed in `nautobot-apps`. The same
-call covers a standalone process talking to a remote Nautobot, so Claude or
-Cursor does not need `NAUTOBOT_MCP_PLUGINS` for Design Builder, Onboarding,
-SSoT, Golden Config, or Nornir. Tools are also enabled when the app's Python
-package is importable in this process.
+enables tools for apps listed in `nautobot-apps`. That covers a local Claude
+or Cursor process too, so `NAUTOBOT_MCP_PLUGINS` is optional. Tools are also
+enabled when the app package is installed in this process.
 
-Set an explicit list or `all` to force tools on without asking the API:
+Force tools on without asking the API:
 
 ```bash
 export NAUTOBOT_MCP_PLUGINS="design_builder,ssot"   # or "all"

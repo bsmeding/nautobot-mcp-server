@@ -1,4 +1,4 @@
-"""Allow ``python -m nautobot_mcp`` to start the server."""
+"""python -m nautobot_mcp"""
 
 from .server import main
 

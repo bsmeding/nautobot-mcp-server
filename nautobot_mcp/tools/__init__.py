@@ -1,8 +1,4 @@
-"""Tool registration for the Nautobot MCP server.
-
-Each submodule defines a ``register(mcp)`` function that attaches its
-tools to a :class:`mcp.server.mcpserver.MCPServer` instance.
-"""
+"""Register MCP tools. Each module has register(mcp)."""
 
 from __future__ import annotations
 
@@ -13,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def register_all(mcp: MCPServer) -> None:
-    """Register every tool module with the given MCP server."""
+    """Attach core tools, then the plugin tools that are enabled."""
     from . import (
         circuits,
         dcim,

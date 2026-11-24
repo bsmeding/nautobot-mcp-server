@@ -1,11 +1,6 @@
-"""Deprecated module — kept for backwards compatibility.
+"""Old import path. Use nautobot_mcp.client.
 
-The implementation moved to :mod:`nautobot_mcp.client`. This shim
-re-exports :class:`NautobotClient` so that any external code importing
-``from nautobot_mcp.nautobot_client import NautobotClient``
-keeps working.
-
-Will be removed in a future major release.
+`from nautobot_mcp.nautobot_client import NautobotClient` still works.
 """
 
 from __future__ import annotations

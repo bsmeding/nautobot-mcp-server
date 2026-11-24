@@ -14,7 +14,7 @@ def client() -> NautobotClient:
 
 
 def clean_filters(filters: dict[str, Any] | None) -> dict[str, Any]:
-    """Drop None values so they don't end up as ``?key=None`` in the URL."""
+    """Drop None and empty strings so they are not sent as query params."""
     if not filters:
         return {}
     return {k: v for k, v in filters.items() if v is not None and v != ""}
@@ -26,11 +26,7 @@ async def lookup_id_or_name(
     *,
     name_field: str = "name",
 ) -> dict[str, Any]:
-    """Resolve ``identifier`` to a Nautobot object.
-
-    Tries the identifier as an object ID (UUID or integer) first; if that
-    yields a 404, falls back to a filter lookup by ``name_field``.
-    """
+    """Object by UUID, or by name when the id lookup is a 404."""
     import httpx
 
     cli = client()

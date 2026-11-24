@@ -1,9 +1,4 @@
-"""Tools for the Nautobot Golden Config app (``nautobot-golden-config``).
-
-Golden Config provides configuration backups, intended-config generation,
-and compliance checking, all driven by Nautobot Jobs and exposed via REST
-models under ``/api/plugins/golden-config/``.
-"""
+"""Golden Config — backups, intended config, and compliance."""
 
 from __future__ import annotations
 

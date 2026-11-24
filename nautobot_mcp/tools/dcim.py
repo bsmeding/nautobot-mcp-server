@@ -1,8 +1,4 @@
-"""DCIM (Data Center Infrastructure Management) tools.
-
-Covers devices, interfaces, racks, locations, device types, manufacturers,
-platforms, and cables.
-"""
+"""DCIM tools — devices, interfaces, racks, locations, cables."""
 
 from __future__ import annotations
 

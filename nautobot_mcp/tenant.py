@@ -1,29 +1,16 @@
-"""Tenant scoping for the Nautobot MCP server.
+"""Limit REST calls to configured tenants.
 
-In MSP / multi-tenant deployments a single MCP server (and a single
-Nautobot token) may serve agents that must only ever see one customer's
-data. When ``tenant_scope`` / ``tenant_group_scope`` are configured, the
-:class:`~nautobot_mcp.client.NautobotClient` enforces those limits
-centrally so an agent cannot cross customer boundaries -- regardless of
-the filters it passes.
-
-Enforcement is applied to *tenant-aware* endpoints only (the ones whose
-objects carry a ``tenant`` foreign key). Endpoints that have no tenant
-concept (manufacturers, platforms, statuses, content-types, ...) are left
-untouched.
-
-This module is deliberately Nautobot-version-pinned via a static map of
-endpoints rather than runtime schema introspection: it keeps enforcement
-predictable and auditable.
+MSP use: one server, one token, but the agent only sees named tenants.
+Only endpoints that have a tenant field are filtered. The endpoint map
+is static on purpose — no schema lookup at runtime.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-# Map of tenant-aware REST endpoint -> the query-param used to constrain a
-# *list* by tenant UUID. For most models this is ``tenant_id``; for the
-# tenants endpoint itself we constrain by the object's own ``id``.
+# Endpoint -> query param that limits a list to a tenant UUID.
+# Most models use tenant_id. The tenants endpoint itself uses id.
 _TENANT_FILTER_PARAM: dict[str, str] = {
     "/api/dcim/devices/": "tenant_id",
     "/api/dcim/racks/": "tenant_id",
@@ -43,26 +30,20 @@ TENANTS_ENDPOINT = "/api/tenancy/tenants/"
 
 
 def tenant_filter_param(endpoint: str) -> str | None:
-    """Return the constraining query-param name for ``endpoint``.
-
-    ``None`` means the endpoint is not tenant-aware and should not be
-    scoped at all.
-    """
+    """Query param for this endpoint, or None when it has no tenant."""
     return _TENANT_FILTER_PARAM.get(endpoint)
 
 
 def is_tenant_aware(endpoint: str) -> bool:
-    """True when objects at ``endpoint`` carry a tenant we can enforce on."""
+    """True when this endpoint has a tenant field we filter on."""
     return endpoint in _TENANT_FILTER_PARAM
 
 
 def tenant_id_of(endpoint: str, obj: dict[str, Any]) -> str | None:
-    """Extract the tenant UUID an object belongs to.
+    """Tenant UUID on this object.
 
-    For the tenants endpoint the relevant id is the object's own ``id``.
-    For every other tenant-aware endpoint it is ``obj["tenant"]["id"]``.
-    Returns ``None`` when the object has no tenant assigned (which, under
-    an active scope, is treated as out-of-scope).
+    Tenants endpoint: the object's own id. Elsewhere: obj["tenant"]["id"].
+    None means no tenant — treated as out of scope when a scope is active.
     """
     if endpoint == TENANTS_ENDPOINT:
         return obj.get("id")
@@ -75,7 +56,7 @@ def tenant_id_of(endpoint: str, obj: dict[str, Any]) -> str | None:
 
 
 class TenantScope:
-    """Holds the configured scope and caches the resolved tenant UUIDs."""
+    """Configured tenant names, plus the UUIDs once they are looked up."""
 
     def __init__(
         self,

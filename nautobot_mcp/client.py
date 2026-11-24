@@ -1,14 +1,8 @@
-"""Async HTTP client for Nautobot REST + GraphQL APIs.
+"""Async client for Nautobot REST and GraphQL.
 
-The client is intentionally generic: callers pass an endpoint path
-(starting with ``/api/``) plus optional filters. The class adds:
-
-* token authentication
-* response retries with exponential back-off on transport errors and 5xx
-* automatic pagination (``rest_list``)
-* a write-mode safety gate (refuses POST/PATCH/PUT/DELETE unless
-  ``allow_writes`` is True). GraphQL queries are exempt because Nautobot
-  exposes them via POST.
+Callers pass an /api/ path. This adds the token, retries, pagination,
+and blocks writes unless allow_writes is set. GraphQL stays allowed —
+Nautobot serves it as POST.
 """
 
 from __future__ import annotations
@@ -43,7 +37,7 @@ _READ_POST_ENDPOINTS: frozenset[str] = frozenset(
 
 
 class NautobotClient:
-    """Async wrapper around Nautobot's REST and GraphQL APIs."""
+    """HTTP session for one Nautobot instance."""
 
     def __init__(self, settings: NautobotMcpSettings) -> None:
         self.settings = settings
@@ -96,11 +90,10 @@ class NautobotClient:
         return endpoint
 
     def _authorization(self) -> str:
-        """Authorization header for this call.
+        """Authorization header.
 
-        A token sent by the MCP client identifies that person to Nautobot.
-        On HTTP, ``require_client_token`` refuses the call when the client
-        did not send one, so the action is not recorded as a shared user.
+        The caller's token wins. With require_client_token, a missing
+        header is refused so the call is not logged as the shared user.
         """
         client_token = current_client_token()
         if client_token:
@@ -134,12 +127,10 @@ class NautobotClient:
     # ---- tenant scoping ------------------------------------------------
 
     async def _resolve_tenant_ids(self) -> frozenset[str] | None:
-        """Resolve configured tenant/group names to a set of tenant UUIDs.
+        """Tenant UUIDs for the configured names. Cached.
 
-        Returns ``None`` when no scope is configured. The result is cached
-        on the :class:`TenantScope`. Raises ``PermissionError`` when the
-        configured scope resolves to zero tenants (a likely misconfig that
-        would otherwise silently hide all data).
+        None when no scope is set. Raises when the names match nothing —
+        otherwise every list would come back empty with no error.
         """
         if not self.tenant_scope.active:
             return None
@@ -147,9 +138,8 @@ class NautobotClient:
             return self.tenant_scope.resolved_ids
 
         ids: set[str] = set()
-        # Resolve by tenant name/slug and by tenant group. These GETs use
-        # ``_request`` directly so they bypass scope enforcement (avoiding
-        # infinite recursion).
+        # Name and tenant-group lookups. Use _request directly so the
+        # scope filter does not call this again.
         for name in self.tenant_scope.names:
             resp = await self._request(
                 "GET", TENANTS_ENDPOINT, params={"name": name, "limit": 200}
@@ -177,7 +167,7 @@ class NautobotClient:
     async def _scoped_params(
         self, endpoint: str, params: dict[str, Any] | None
     ) -> dict[str, Any] | None:
-        """Inject the tenant constraint into list params, if in scope."""
+        """Add the tenant filter to list params when a scope is active."""
         ids = await self._resolve_tenant_ids()
         if ids is None:
             return params
@@ -194,7 +184,7 @@ class NautobotClient:
     async def _assert_object_in_scope(
         self, endpoint: str, obj: dict[str, Any]
     ) -> None:
-        """Raise ``PermissionError`` if ``obj`` is outside the tenant scope."""
+        """Refuse obj when it is outside the tenant scope."""
         ids = await self._resolve_tenant_ids()
         if ids is None or tenant_filter_param(endpoint) is None:
             return
@@ -208,7 +198,7 @@ class NautobotClient:
     async def _enforce_create_tenant(
         self, endpoint: str, data: Any
     ) -> Any:
-        """Validate/inject the tenant on a create payload under scope."""
+        """Put the scoped tenant on a create body, or refuse a foreign one."""
         ids = await self._resolve_tenant_ids()
         if ids is None or tenant_filter_param(endpoint) is None:
             return data
@@ -230,7 +220,7 @@ class NautobotClient:
         return payload
 
     async def _assert_tenant_value_in_scope(self, tenant_val: Any) -> None:
-        """Resolve a tenant value (UUID, name, or dict) and check scope."""
+        """Turn a UUID, name, or dict into a tenant id and check the scope."""
         ids = await self._resolve_tenant_ids()
         if ids is None:
             return
@@ -329,13 +319,13 @@ class NautobotClient:
     async def rest_get(
         self, endpoint: str, params: dict[str, Any] | None = None
     ) -> Any:
-        """GET an arbitrary Nautobot REST endpoint (returns one page)."""
+        """GET one page of a REST endpoint."""
         ep = self._normalize_endpoint(endpoint)
         resp = await self._request("GET", ep, params=params)
         return resp.json()
 
     async def rest_get_object(self, endpoint: str, object_id: str) -> Any:
-        """GET a single object: ``<endpoint>{object_id}/``."""
+        """GET <endpoint><object_id>/."""
         ep = self._normalize_endpoint(endpoint)
         resp = await self._request("GET", f"{ep}{object_id}/")
         obj = resp.json()
@@ -352,15 +342,10 @@ class NautobotClient:
         paginate: bool = False,
         max_records: int | None = None,
     ) -> list[Any] | dict[str, Any]:
-        """List objects with optional filters and auto-pagination.
+        """List objects.
 
-        When ``paginate`` is ``True``, walks the ``next`` URLs until
-        either exhausted or ``max_records`` (or
-        ``settings.max_pagination_records``) is reached and returns a
-        flat list of records.
-
-        When ``paginate`` is ``False`` (default), returns the raw page
-        envelope ``{count, next, previous, results}``.
+        paginate=False returns one page ({count, next, previous, results}).
+        paginate=True follows next until the cap and returns a flat list.
         """
         ep = self._normalize_endpoint(endpoint)
         params: dict[str, Any] = {}
@@ -443,7 +428,7 @@ class NautobotClient:
         return resp.json()
 
     async def graphql_introspect(self) -> dict[str, Any]:
-        """Run a small GraphQL introspection query."""
+        """Small GraphQL introspection query."""
         query = (
             "query { __schema { "
             "queryType { name } "
@@ -456,9 +441,9 @@ class NautobotClient:
     # ---- meta ----------------------------------------------------------
 
     async def list_api_roots(self) -> dict[str, Any]:
-        """Return Nautobot's API root document for endpoint discovery."""
+        """GET /api/ — category names and URLs."""
         return await self.rest_get("/api/")
 
     async def status(self) -> dict[str, Any]:
-        """Return Nautobot's status endpoint (version, plugins, db, etc.)."""
+        """GET /api/status/ — versions and installed apps."""
         return await self.rest_get("/api/status/")
