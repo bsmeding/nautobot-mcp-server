@@ -38,9 +38,13 @@ def test_missing_headers() -> None:
 
 @pytest.mark.asyncio
 async def test_middleware_binds_token_only_for_the_call() -> None:
+    class _Request:
+        def __init__(self) -> None:
+            self.headers = {"X-Nautobot-Token": "caller"}
+
     class _Ctx:
-        class request:
-            headers = {"X-Nautobot-Token": "caller"}
+        def __init__(self) -> None:
+            self.request = _Request()
 
     seen: dict[str, object] = {}
 
