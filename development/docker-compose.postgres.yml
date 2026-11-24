@@ -6,8 +6,10 @@ services:
     env_file:
       - "development.env"
       - "creds.env"
+    # Postgres 18 stores data under /var/lib/postgresql/<version>. Mounting
+    # the old /var/lib/postgresql/data path makes the container exit.
     volumes:
-      - "postgres_data:/var/lib/postgresql/data"
+      - "postgres_data:/var/lib/postgresql"
     healthcheck:
       test: ["CMD", "pg_isready", "--username=$$POSTGRES_USER", "--dbname=$$POSTGRES_DB"]
       interval: "10s"

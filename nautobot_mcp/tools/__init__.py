@@ -46,7 +46,15 @@ def register_all(mcp: MCPServer) -> None:
     from . import plugins
 
     try:
-        plugins_setting = get_settings().plugins
+        settings = get_settings()
+        plugins_setting = settings.plugins
     except RuntimeError:  # settings not initialized (e.g. some test paths)
+        settings = None
         plugins_setting = ("auto",)
-    set_enabled_plugins(tuple(plugins.register_plugins(mcp, plugins_setting)))
+    remote_apps = None
+    selectors = {item.lower().replace("-", "_") for item in plugins_setting}
+    if settings is not None and "auto" in selectors:
+        remote_apps = plugins.fetch_installed_app_names(settings)
+    set_enabled_plugins(
+        tuple(plugins.register_plugins(mcp, plugins_setting, remote_apps=remote_apps))
+    )

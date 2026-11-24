@@ -10,7 +10,7 @@ from nautobot.apps.ui import NavMenuGroup, NavMenuItem, NavMenuTab
 
 menu_items = (
     NavMenuTab(
-        label="Apps",
+        name="Apps",
         groups=(
             NavMenuGroup(
                 name="MCP Server",

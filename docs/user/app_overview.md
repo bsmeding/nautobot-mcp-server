@@ -26,11 +26,25 @@ The server is a thin, auditable layer over Nautobot's APIs:
   a `graphql_query` escape hatch.
 - Optional plugin tool modules for popular Nautobot apps, enabled on demand.
 
+## In the Nautobot UI
+
+When `nautobot_mcp` is in `PLUGINS` and Nautobot has been restarted:
+
+- **Apps → Installed Apps** lists Nautobot MCP Server.
+- **Apps → MCP Server → MCP Server Status** (`/plugins/mcp-server/`) shows
+  settings and the log tail when `log_file` is set.
+
+A local Claude or Cursor install does not need the app. Those clients run
+`nautobot-mcp` themselves with `NAUTOBOT_URL` and `NAUTOBOT_TOKEN`.
+
 ## Safety model
 
 - **Read-only by default** — `rest_create` / `rest_update` / `rest_delete` and
   the domain write tools are blocked unless `allow_writes` is enabled.
 - **Tenant scoping** — restrict every read and write to one or more tenants for
   MSP-style isolation.
-- **Token-scoped** — the server can only do what the configured API token's
-  Nautobot permissions allow; Job runs are additionally gated per-job.
+- **Token-scoped** — each call runs as a Nautobot API token, and Nautobot's
+  change log records that token's user. On a shared HTTP server set
+  `require_client_token` and have every MCP client send `X-Nautobot-Token`.
+  A local stdio process uses its own `NAUTOBOT_TOKEN`. Job runs follow the
+  same token.

@@ -13,17 +13,16 @@ It can be used in two ways:
   with the `nautobot-mcp` console script, talking to a remote Nautobot
   over its REST API.
 
-This release focuses on **Nautobot's internal/built-in models only** (DCIM,
-IPAM, circuits, tenancy, virtualization, extras/jobs, users, GraphQL).
-Third-party Nautobot apps (Design Builder, Onboarding, SSoT, Golden Config,
-ChatOps, …) are not yet wrapped — but the generic `rest_list` / `rest_get`
-tools work against their endpoints if your token has access.
+Core tools cover DCIM, IPAM, circuits, tenancy, virtualization, extras/jobs,
+users, and GraphQL. Optional extras add Design Builder, Onboarding, SSoT,
+Golden Config, and Nornir. The generic `rest_list` / `rest_get` tools work
+against any other endpoint the token can access.
 
 ## Installation
 
 Published on PyPI as [`nautobot-mcp`](https://pypi.org/project/nautobot-mcp/).
 The Nautobot plugin name is `nautobot_mcp`. The console script is
-`nautobot-mcp`.
+`nautobot-mcp`. Release history is in [CHANGELOG.md](CHANGELOG.md).
 
 ```bash
 pip install nautobot-mcp
@@ -50,13 +49,14 @@ pip install "nautobot-mcp[nornir]"            # Nornir backend tools
 pip install "nautobot-mcp[all]"               # all of the above
 ```
 
-By default (`plugins = ["auto"]`) a plugin's tools are registered when its
-Python package is importable — so installing an extra is all you need when the
-MCP server shares the Nautobot environment.
+By default (`plugins = ["auto"]`) the server calls `GET /api/status/` and
+enables a plugin's tools when that app is listed in `nautobot-apps`. The same
+call covers a standalone process talking to a remote Nautobot, so Claude or
+Cursor does not need `NAUTOBOT_MCP_PLUGINS` for Design Builder, Onboarding,
+SSoT, Golden Config, or Nornir. Tools are also enabled when the app's Python
+package is importable in this process.
 
-For a **standalone** MCP server talking to a *remote* Nautobot, the app lives
-on the remote instance, not in the MCP server's venv. In that case don't rely
-on `auto`; enable the tools explicitly:
+Set an explicit list or `all` to force tools on without asking the API:
 
 ```bash
 export NAUTOBOT_MCP_PLUGINS="design_builder,ssot"   # or "all"
@@ -83,6 +83,7 @@ PLUGINS_CONFIG = {
         "max_pagination_records": 5000,
         "allow_writes": False,
         "log_level": "INFO",
+        "require_client_token": False,
         # Tenant scoping (MSP multi-tenant isolation); empty = no scoping
         "tenant_scope": [],          # e.g. ["acme", "globex"]
         "tenant_group_scope": [],    # e.g. ["managed-customers"]
@@ -90,7 +91,12 @@ PLUGINS_CONFIG = {
 }
 ```
 
-Then run the MCP server alongside Nautobot:
+Restart Nautobot. The app is listed under **Apps → Installed Apps**.
+**Apps → MCP Server → MCP Server Status** (`/plugins/mcp-server/`) shows the
+resolved settings. Set `log_file` to also show the log tail there.
+
+Then run the MCP server alongside Nautobot. The status page is not the MCP
+endpoint.
 
 ```bash
 nautobot-mcp
@@ -114,7 +120,8 @@ All configuration knobs:
 | Env var | Default | Purpose |
 | --- | --- | --- |
 | `NAUTOBOT_URL` | — (required) | Nautobot base URL. |
-| `NAUTOBOT_TOKEN` | — (required) | Nautobot API token. |
+| `NAUTOBOT_TOKEN` | — (required unless client tokens) | API token for this process. |
+| `NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN` | `false` | HTTP clients must send their own Nautobot token. |
 | `NAUTOBOT_MCP_VERIFY_SSL` | `true` | `false` disables TLS verification. |
 | `NAUTOBOT_MCP_CA_BUNDLE` | — | Path to a CA bundle (private CA setups). |
 | `NAUTOBOT_MCP_TIMEOUT` | `30` | HTTP timeout in seconds. |
@@ -124,11 +131,14 @@ All configuration knobs:
 | `NAUTOBOT_MCP_TENANT_GROUP_SCOPE` | — | Comma-separated tenant group names to restrict access to. |
 | `NAUTOBOT_MCP_PLUGINS` | `auto` | Plugin integrations to enable. |
 | `NAUTOBOT_MCP_LOG_LEVEL` | `INFO` | Log level (logs go to stderr). |
+| `NAUTOBOT_MCP_LOG_FILE` | — | Also append logs to this file. The Nautobot status page shows the tail. |
 | `NAUTOBOT_MCP_HOST` | `127.0.0.1` | Bind address for `streamable-http` and `sse`. |
 | `NAUTOBOT_MCP_PORT` | `8000` | Bind port for `streamable-http` and `sse`. |
 
-Connection credentials stay as `NAUTOBOT_URL` / `NAUTOBOT_TOKEN`. MCP-specific
-knobs use the `NAUTOBOT_MCP_` prefix. Legacy unprefixed names
+`NAUTOBOT_URL` is the Nautobot instance. `NAUTOBOT_TOKEN` is this process's
+token, unless `NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN` is set and each HTTP client
+sends its own. MCP-specific knobs use the `NAUTOBOT_MCP_` prefix. Legacy
+unprefixed names
 (`NAUTOBOT_ALLOW_WRITES`, `NAUTOBOT_TENANT_SCOPE`, `MCP_LOG_LEVEL`, …) are
 still accepted; the prefixed form wins when both are set.
 
@@ -167,6 +177,40 @@ nautobot-mcp --transport sse
 ```
 
 Streamable HTTP is served at `/mcp`. SSE is served at `/sse`.
+
+## One Nautobot user per MCP client
+
+Nautobot records changes as the user that owns the API token. Put each
+person's token in their own client so the change log shows who did what.
+
+On a shared HTTP server, do not set `NAUTOBOT_TOKEN`. Require the client
+token instead:
+
+```bash
+export NAUTOBOT_URL="https://nautobot.example.com"
+export NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN=true
+nautobot-mcp --transport streamable-http --host 0.0.0.0 --port 8000
+```
+
+Each Cursor, Claude Desktop, or other MCP client sends its own token:
+
+```json
+{
+  "mcpServers": {
+    "nautobot": {
+      "url": "http://mcp-host:8000/mcp",
+      "headers": {
+        "X-Nautobot-Token": "YOUR_PERSONAL_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+`Authorization: Token <your token>` is also accepted. A request without a
+token is refused, so it is not attributed to a shared account. A local
+stdio process is already one person: set `NAUTOBOT_TOKEN` in that person's
+MCP config to their token.
 
 ## Read-only by default
 

@@ -6,6 +6,7 @@ import httpx
 import pytest
 import respx
 
+from nautobot_mcp.auth import bind_http_headers, reset_http_headers
 from nautobot_mcp.client import NautobotClient
 from nautobot_mcp.config import NautobotMcpSettings
 
@@ -147,3 +148,50 @@ async def test_pagination_respects_max_records() -> None:
     assert isinstance(results, list)
     assert len(results) == 2
     await cli.aclose()
+
+
+@respx.mock
+async def test_request_uses_caller_token_not_server_token() -> None:
+    server_token = "s" * 40
+    caller_token = "c" * 40
+    cli = NautobotClient(_settings(token=server_token))
+    route = respx.get("https://nautobot.example.com/api/dcim/devices/").mock(
+        return_value=httpx.Response(200, json={"results": []})
+    )
+    tokens = bind_http_headers({"X-Nautobot-Token": caller_token})
+    try:
+        await cli.rest_get("/api/dcim/devices/")
+    finally:
+        reset_http_headers(tokens)
+        await cli.aclose()
+
+    assert route.calls.last.request.headers["Authorization"] == f"Token {caller_token}"
+
+
+@respx.mock
+async def test_require_client_token_rejects_http_call_without_token() -> None:
+    cli = NautobotClient(_settings(token="s" * 40, require_client_token=True))
+    route = respx.get("https://nautobot.example.com/api/dcim/devices/").mock(
+        return_value=httpx.Response(200, json={"results": []})
+    )
+    tokens = bind_http_headers({})
+    try:
+        with pytest.raises(PermissionError, match="your own Nautobot API token"):
+            await cli.rest_get("/api/dcim/devices/")
+    finally:
+        reset_http_headers(tokens)
+        await cli.aclose()
+
+    assert not route.called
+
+
+@respx.mock
+async def test_require_client_token_allows_process_token_off_http() -> None:
+    """Stdio has no HTTP headers; the process token is that client's identity."""
+    cli = NautobotClient(_settings(token="s" * 40, require_client_token=True))
+    route = respx.get("https://nautobot.example.com/api/dcim/devices/").mock(
+        return_value=httpx.Response(200, json={"results": []})
+    )
+    await cli.rest_get("/api/dcim/devices/")
+    await cli.aclose()
+    assert route.calls.last.request.headers["Authorization"] == f"Token {'s' * 40}"

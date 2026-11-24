@@ -6,10 +6,13 @@ for LLMs and AI assistants.
 
 It can run two ways:
 
-- **As a Nautobot app** — add `nautobot_mcp` to `PLUGINS` and configure
-  it via `PLUGINS_CONFIG`.
-- **As a standalone MCP server** — run the `nautobot-mcp` console script
-  against any reachable Nautobot, configured with environment variables.
+- **On the client** — Claude Desktop or Cursor runs `nautobot-mcp` with
+  `NAUTOBOT_URL` and `NAUTOBOT_TOKEN` in `mcpServers`. Nautobot does not
+  need the app installed for this.
+- **As a Nautobot app** — add `nautobot_mcp` to `PLUGINS`. It shows under
+  **Apps → Installed Apps** and **Apps → MCP Server → MCP Server Status**
+  (settings and, with `log_file`, the log tail). The MCP process still
+  runs beside Nautobot.
 
 ## Highlights
 

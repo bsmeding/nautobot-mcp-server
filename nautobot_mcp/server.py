@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from . import __version__
+from .auth import ClientTokenMiddleware
 from .client import NautobotClient
 from .config import NautobotMcpSettings, load_settings
 from .logging_config import configure_logging
@@ -83,7 +84,7 @@ def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
 
     resolved = settings or load_settings()
     set_settings(resolved)
-    configure_logging(resolved.log_level)
+    configure_logging(resolved.log_level, resolved.log_file)
     logger.info("Nautobot MCP server starting; settings=%s", resolved.redacted())
 
     @asynccontextmanager
@@ -108,6 +109,7 @@ def build_server(settings: NautobotMcpSettings | None = None) -> MCPServer:
         ),
         version=__version__,
         lifespan=lifespan,
+        middleware=[ClientTokenMiddleware()],
     )
 
     register_all(mcp)

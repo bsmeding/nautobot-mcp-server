@@ -93,6 +93,25 @@ def test_missing_token_raises() -> None:
         load_settings(url="https://x.example.com")
 
 
+def test_client_token_mode_allows_empty_server_token() -> None:
+    s = load_settings(
+        url="https://x.example.com",
+        require_client_token=True,
+    )
+    assert s.token == ""
+    assert s.require_client_token is True
+    assert s.redacted()["token"] == "<per-client>"
+
+
+def test_require_client_token_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("NAUTOBOT_URL", "https://x.example.com")
+    monkeypatch.delenv("NAUTOBOT_TOKEN", raising=False)
+    monkeypatch.setenv("NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN", "true")
+    s = load_settings()
+    assert s.require_client_token is True
+    assert s.token == ""
+
+
 def test_redacted_masks_token() -> None:
     s = NautobotMcpSettings(
         url="https://x", token="0123456789abcdef0123456789abcdef"

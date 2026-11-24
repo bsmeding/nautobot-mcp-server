@@ -19,6 +19,7 @@ from typing import Any
 
 import httpx
 
+from .auth import current_client_token, http_request_active
 from .config import NautobotMcpSettings
 from .tenant import (
     TENANTS_ENDPOINT,
@@ -47,13 +48,19 @@ class NautobotClient:
     def __init__(self, settings: NautobotMcpSettings) -> None:
         self.settings = settings
         self.base_url = settings.url
+        # The server token is the default identity. A per-request token
+        # overrides it in ``_request``. When client tokens are required,
+        # leave the default off so a missing header cannot fall back to a
+        # shared user.
+        headers = {
+            "Accept": "application/json",
+            "User-Agent": "nautobot-mcp",
+        }
+        if settings.token and not settings.require_client_token:
+            headers["Authorization"] = f"Token {settings.token}"
         self._client = httpx.AsyncClient(
             base_url=settings.url,
-            headers={
-                "Authorization": f"Token {settings.token}",
-                "Accept": "application/json",
-                "User-Agent": "nautobot-mcp",
-            },
+            headers=headers,
             verify=settings.verify_ssl,
             timeout=settings.request_timeout,
             follow_redirects=True,
@@ -87,6 +94,30 @@ class NautobotClient:
         if trailing_slash and not endpoint.endswith("/"):
             endpoint = f"{endpoint}/"
         return endpoint
+
+    def _authorization(self) -> str:
+        """Authorization header for this call.
+
+        A token sent by the MCP client identifies that person to Nautobot.
+        On HTTP, ``require_client_token`` refuses the call when the client
+        did not send one, so the action is not recorded as a shared user.
+        """
+        client_token = current_client_token()
+        if client_token:
+            return f"Token {client_token}"
+        if self.settings.require_client_token and http_request_active():
+            raise PermissionError(
+                "Refusing the call: this MCP server requires your own "
+                "Nautobot API token so the change is audited as you. "
+                "Set the X-Nautobot-Token header on the MCP client "
+                "(or Authorization: Token <your token>)."
+            )
+        if not self.settings.token:
+            raise PermissionError(
+                "Nautobot API token is not configured. Set NAUTOBOT_TOKEN "
+                "for this process, or send X-Nautobot-Token from the MCP client."
+            )
+        return f"Token {self.settings.token}"
 
     def _check_write_allowed(self, method: str, endpoint: str) -> None:
         if (
@@ -236,10 +267,16 @@ class NautobotClient:
         if not url.startswith("http"):
             self._check_write_allowed(method, url)
 
+        # Resolve the caller before retrying so a missing token fails once.
+        authorization = self._authorization()
+
         last_exc: Exception | None = None
         for attempt in range(1, max_retries + 1):
             try:
-                request_kwargs: dict[str, Any] = {"params": params}
+                request_kwargs: dict[str, Any] = {
+                    "params": params,
+                    "headers": {"Authorization": authorization},
+                }
                 if json is not None:
                     request_kwargs["json"] = json
                 response = await self._client.request(method, url, **request_kwargs)

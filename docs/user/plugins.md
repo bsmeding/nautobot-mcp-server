@@ -17,11 +17,11 @@ pip install "nautobot-mcp[all]"
 The `plugins` setting (env `NAUTOBOT_MCP_PLUGINS`, default `auto`) decides which
 plugin tools register:
 
-- `auto` — enable a plugin when its Python package is importable. Pairs with the
-  pip extras when the MCP server shares the Nautobot environment.
+- `auto` — call `GET /api/status/` and enable a plugin when its package is in
+  `nautobot-apps` (falling back to `plugins`, then `installed-apps`). Also
+  enable it when the Python package is importable in this process.
 - explicit keys (`design_builder`, `onboarding`, `ssot`, `golden_config`,
-  `nornir`) — force-enable even if the package is not importable locally
-  (useful for a standalone server talking to a remote Nautobot).
+  `nornir`) — force-enable those tools.
 - `all` — force-enable every known plugin.
 
 Inspect the result at runtime with `list_active_plugins`.

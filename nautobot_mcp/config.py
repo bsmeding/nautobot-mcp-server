@@ -7,6 +7,8 @@ Resolution order (highest priority first):
    ``NAUTOBOT_MCP_*`` settings below). Unprefixed legacy aliases
    (``NAUTOBOT_ALLOW_WRITES``, ``NAUTOBOT_TENANT_SCOPE``, …) are still
    accepted but the ``NAUTOBOT_MCP_*`` form wins when both are set.
+   ``NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN`` makes the server token optional:
+   each HTTP client must send its own token in ``X-Nautobot-Token``.
 3. ``settings.PLUGINS_CONFIG["nautobot_mcp"]`` when running inside
    Nautobot/Django.
 """
@@ -95,9 +97,11 @@ class NautobotMcpSettings:
     max_pagination_records: int = 5000
     allow_writes: bool = False
     log_level: str = "INFO"
+    log_file: str = ""
     tenant_scope: tuple[str, ...] = ()
     tenant_group_scope: tuple[str, ...] = ()
     plugins: tuple[str, ...] = ("auto",)
+    require_client_token: bool = False
 
     @property
     def tenant_scoped(self) -> bool:
@@ -106,17 +110,24 @@ class NautobotMcpSettings:
 
     def redacted(self) -> dict[str, Any]:
         """Return a dict suitable for logging (token masked)."""
-        token_preview = (
-            f"{self.token[:4]}…{self.token[-4:]}" if len(self.token) >= 8 else "<set>"
-        )
+        if len(self.token) >= 8:
+            token_preview = f"{self.token[:4]}…{self.token[-4:]}"
+        elif self.token:
+            token_preview = "<set>"
+        elif self.require_client_token:
+            token_preview = "<per-client>"
+        else:
+            token_preview = "<unset>"
         return {
             "url": self.url,
             "token": token_preview,
+            "require_client_token": self.require_client_token,
             "verify_ssl": self.verify_ssl,
             "request_timeout": self.request_timeout,
             "max_pagination_records": self.max_pagination_records,
             "allow_writes": self.allow_writes,
             "log_level": self.log_level,
+            "log_file": self.log_file,
             "tenant_scope": list(self.tenant_scope),
             "tenant_group_scope": list(self.tenant_group_scope),
             "plugins": list(self.plugins),
@@ -174,6 +185,7 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
     log_level = str(
         _pick("log_level", "NAUTOBOT_MCP_LOG_LEVEL", default="INFO") or "INFO"
     ).upper()
+    log_file = str(_pick("log_file", "NAUTOBOT_MCP_LOG_FILE", default="") or "")
     tenant_scope = _coerce_str_tuple(
         _pick("tenant_scope", "NAUTOBOT_MCP_TENANT_SCOPE", default=())
     )
@@ -183,16 +195,26 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
     plugins = _coerce_str_tuple(
         _pick("plugins", "NAUTOBOT_MCP_PLUGINS", default="auto")
     ) or ("auto",)
+    require_client_token = _coerce_bool(
+        _pick(
+            "require_client_token",
+            "NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN",
+            default=False,
+        ),
+        False,
+    )
 
     if not url:
         raise ValueError(
             "Nautobot URL is not configured. Set the NAUTOBOT_URL env var "
             "or PLUGINS_CONFIG['nautobot_mcp']['nautobot_url']."
         )
-    if not token:
+    if not token and not require_client_token:
         raise ValueError(
             "Nautobot API token is not configured. Set the NAUTOBOT_TOKEN env "
-            "var or PLUGINS_CONFIG['nautobot_mcp']['nautobot_token']."
+            "var or PLUGINS_CONFIG['nautobot_mcp']['nautobot_token']. "
+            "For a shared server where each MCP client sends its own token, "
+            "set NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN=true instead."
         )
 
     return NautobotMcpSettings(
@@ -203,10 +225,21 @@ def load_settings(**overrides: Any) -> NautobotMcpSettings:
         max_pagination_records=max_pagination_records,
         allow_writes=allow_writes,
         log_level=log_level,
+        log_file=log_file,
         tenant_scope=tenant_scope,
         tenant_group_scope=tenant_group_scope,
         plugins=tuple(p.lower().replace("-", "_") for p in plugins),
+        require_client_token=require_client_token,
     )
+
+
+def plugin_config_snapshot() -> dict[str, Any]:
+    """Return ``PLUGINS_CONFIG['nautobot_mcp']`` without validating it.
+
+    The status page uses this when the MCP process is not fully configured
+    yet, so the app can still show which settings are present.
+    """
+    return _from_django_settings()
 
 
 def _django_key(key: str) -> str:

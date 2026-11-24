@@ -27,14 +27,27 @@ class MCPServerHomeView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["version"] = __version__
 
+        log_file = ""
         try:
             from .config import load_settings
 
             context["settings"] = load_settings().redacted()
             context["config_error"] = None
+            log_file = context["settings"].get("log_file") or ""
         except Exception as exc:  # configuration not yet provided
             context["settings"] = None
             context["config_error"] = str(exc)
+            try:
+                from .config import plugin_config_snapshot
+
+                log_file = str(plugin_config_snapshot().get("log_file") or "")
+            except Exception:
+                log_file = ""
+
+        from .logging_config import read_log_tail
+
+        context["log_file"] = log_file
+        context["log_text"] = read_log_tail(log_file)
 
         try:
             from .tools.plugins import available_plugins

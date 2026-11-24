@@ -8,8 +8,16 @@
   <div class="col-md-12">
     <h1>Nautobot MCP Server</h1>
     <p class="text-muted">
-      Model Context Protocol (MCP) server exposing Nautobot's REST and GraphQL
-      APIs to LLM/AI assistants. Version <strong>{{ version }}</strong>.
+      This app is installed. Version <strong>{{ version }}</strong>.
+      It is listed under <strong>Apps → Installed Apps</strong>.
+      This page is <strong>Apps → MCP Server → MCP Server Status</strong>
+      (<code>/plugins/mcp-server/</code>).
+    </p>
+    <p>
+      Installing the app does not start the MCP server. Run
+      <code>nautobot-mcp</code> next to Nautobot, or let each person run it
+      locally with their own <code>NAUTOBOT_URL</code> and <code>NAUTOBOT_TOKEN</code>.
+      Claude and Cursor talk to that process, not to this page.
     </p>
   </div>
 </div>
@@ -18,20 +26,58 @@
 <div class="row">
   <div class="col-md-12">
     <div class="alert alert-warning" role="alert">
-      <strong>Not configured:</strong> {{ config_error }}
+      <strong>MCP process is not fully configured here:</strong> {{ config_error }}
+      Local clients can still set <code>NAUTOBOT_URL</code> and <code>NAUTOBOT_TOKEN</code>
+      in their own MCP config.
     </div>
   </div>
 </div>
 {% endif %}
 
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading"><strong>Client setup</strong></div>
+      <div class="panel-body">
+        <p>
+          <strong>Local (Claude Desktop, Cursor).</strong>
+          Nothing else is installed in Nautobot. On the client machine,
+          <code>uv</code> is enough; <code>uvx</code> runs <code>nautobot-mcp</code>.
+          Each person puts their own token in their MCP config:
+        </p>
+        <pre>{
+  "mcpServers": {
+    "nautobot": {
+      "command": "uvx",
+      "args": ["nautobot-mcp"],
+      "env": {
+        "NAUTOBOT_URL": "https://nautobot.example.com",
+        "NAUTOBOT_TOKEN": "YOUR_PERSONAL_API_TOKEN"
+      }
+    }
+  }
+}</pre>
+        <p>
+          <strong>Shared server on this Nautobot host.</strong>
+          Start <code>nautobot-mcp --transport streamable-http</code>.
+          Set <code>require_client_token</code> so each client sends
+          <code>X-Nautobot-Token</code>. One <code>nautobot_token</code> in
+          <code>PLUGINS_CONFIG</code> would record every person as that user.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% if settings %}
 <div class="row">
   <div class="col-md-6">
     <div class="panel panel-default">
-      <div class="panel-heading"><strong>Resolved configuration</strong></div>
+      <div class="panel-heading"><strong>Settings</strong></div>
       <table class="table table-hover panel-body attr-table">
         <tr><td>URL</td><td>{{ settings.url }}</td></tr>
         <tr><td>Token</td><td>{{ settings.token }}</td></tr>
+        <tr><td>Require client token</td><td>{{ settings.require_client_token }}</td></tr>
         <tr><td>Verify SSL</td><td>{{ settings.verify_ssl }}</td></tr>
         <tr><td>Request timeout</td><td>{{ settings.request_timeout }}s</td></tr>
         <tr><td>Max pagination records</td><td>{{ settings.max_pagination_records }}</td></tr>
@@ -40,6 +86,7 @@
         <tr><td>Tenant group scope</td><td>{{ settings.tenant_group_scope|join:", "|default:"—" }}</td></tr>
         <tr><td>Plugins</td><td>{{ settings.plugins|join:", " }}</td></tr>
         <tr><td>Log level</td><td>{{ settings.log_level }}</td></tr>
+        <tr><td>Log file</td><td>{{ settings.log_file|default:"— (stderr only)" }}</td></tr>
       </table>
     </div>
   </div>
@@ -57,4 +104,29 @@
   </div>
 </div>
 {% endif %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading"><strong>Log</strong></div>
+      <div class="panel-body">
+        {% if log_text is None %}
+        <p class="text-muted">
+          Logs from <code>nautobot-mcp</code> go to that process's stderr.
+          Set <code>log_file</code> (or <code>NAUTOBOT_MCP_LOG_FILE</code>)
+          to show the tail here.
+        </p>
+        {% elif not log_text %}
+        <p class="text-muted">
+          Log file <code>{{ log_file }}</code> is not there yet.
+          It is created when <code>nautobot-mcp</code> starts with this path.
+        </p>
+        {% else %}
+        <p class="text-muted">Tail of <code>{{ log_file }}</code>.</p>
+        <pre style="max-height: 24rem; overflow: auto;">{{ log_text }}</pre>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,5 +1,23 @@
 # Release Notes
 
+The same history is in [CHANGELOG.md](https://github.com/bsmeding/nautobot-app-mcp-server/blob/main/CHANGELOG.md) at the repository root.
+
+## Unreleased
+
+- `plugins=auto` reads Nautobot `GET /api/status/` and enables app tools whose
+  package is listed in `nautobot-apps` (Design Builder, Onboarding, SSoT,
+  Golden Config, Nornir). A standalone Claude or Cursor process no longer
+  needs `NAUTOBOT_MCP_PLUGINS` for those apps. Local package detection still
+  applies, and an explicit list or `all` still forces tools on.
+- The Nautobot UI lists the app under **Apps → Installed Apps** and
+  **Apps → MCP Server → MCP Server Status**. That page shows the resolved
+  settings and, when `log_file` / `NAUTOBOT_MCP_LOG_FILE` is set, the log tail.
+- Shared HTTP servers can require each MCP client to send its own Nautobot
+  API token (`X-Nautobot-Token`, or `Authorization: Token`). Nautobot then
+  audits the call as that token's user. Set
+  `NAUTOBOT_MCP_REQUIRE_CLIENT_TOKEN=true` (or `require_client_token` in
+  `PLUGINS_CONFIG`). A missing token is refused.
+
 ## v0.2.5
 
 - The console script is `nautobot-mcp`, so `uvx nautobot-mcp` starts the server.
